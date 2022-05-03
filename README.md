@@ -72,21 +72,7 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
    }
    ```
 
-4. Environment variable config (JSK, MURI)
-   In `.env`
 
-   ```txt
-    JWT_SECRET_KEY=someKey
-    MONGO_DEV_URI=mongodb://locahost:27017/
-    MONGO_PRO_URI=mongodb_srv://atlas.com/
-   ```
-
-   In `.gitignore`
-
-   ```txt
-    node_modules
-   .env
-   ```
 
 ## The end
 
