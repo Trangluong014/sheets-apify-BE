@@ -94,7 +94,7 @@ adminController.adminList = catchAsync(async (req, res, next) => {
 
 // Admin can see other admin with same website's information by id
 
-adminController.getSingleAdminInforById = catchAsync(async (req, res, next) => {
+adminController.getSingleAdminInfoById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { currentAdminId } = req;
   const currentAdmin = await Admin.findById({ currentAdminId });
@@ -119,7 +119,7 @@ adminController.getSingleAdminInforById = catchAsync(async (req, res, next) => {
 
 // Admin can see own user's information
 
-adminController.getAdminOwnInfor = catchAsync(async (req, res, next) => {
+adminController.getAdminOwnInfo = catchAsync(async (req, res, next) => {
   const { currentAdminId } = req;
   const admin = await Admin.findById(currentAdminId);
   if (!admin) {

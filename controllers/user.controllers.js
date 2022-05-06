@@ -54,7 +54,7 @@ userController.userLogin = catchAsync(async (req, res, next) => {
 
 // user can see own user's information
 
-userController.getuserOwnInfor = catchAsync(async (req, res, next) => {
+userController.getUserOwnInfo = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
   const user = await User.findById(currentUserId);
   if (!user) {
@@ -92,7 +92,7 @@ userController.UpdateUserAccount = catchAsync(async (req, res, next) => {
     true,
     { user },
     null,
-    "Update user Infor success"
+    "Update user Information success"
   );
 });
 
