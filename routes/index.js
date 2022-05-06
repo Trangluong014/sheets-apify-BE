@@ -2,15 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const googleRoutes = require("./google.api");
-router.use("/googles", googleRoutes);
+router.use("/google", googleRoutes);
 
 const adminRoutes = require("./admin.api");
-router.use("/admins", adminRoutes);
+router.use("/admin", adminRoutes);
 
 const websiteRoutes = require("./website.api");
-router.use("/websites", websiteRoutes);
+router.use("/website", websiteRoutes);
 
 const userRoutes = require("./users.api.js");
-router.use("/users", userRoutes);
+router.use("/user", userRoutes);
 
 module.exports = router;

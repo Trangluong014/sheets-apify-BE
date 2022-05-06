@@ -18,7 +18,6 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
 6. Owner can update own account profile
 7. Owner can deactivate own account
 8. Owner can update password
-9. Admin can see list of their own websites.
 
 ### CRUD with website user
 
@@ -36,6 +35,7 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
 3. Update website
 4. Delete website
 5. Get comment/update vote from fe and save to be
+6. Admin can see list of their own websites.
 
 ## Production API
 

@@ -1,3 +1,7 @@
+const fs = require("fs");
+const { google } = require("googleapis");
+const { sheets } = require("googleapis/build/src/apis/sheets");
+
 const utilsHelper = {};
 
 // This function controls the way we response to the client
@@ -28,6 +32,18 @@ utilsHelper.catchAsync = (func) => (req, res, next) =>
 //     return fnc(req, res, next).catch((err) => (next) => err);
 //   };
 // }
+utilsHelper.googleAuth = () => {
+  let credentials = fs.readFileSync("client_secret.json", "utf8");
+  credentials = JSON.parse(credentials);
+  console.log(credentials);
+  const { client_id, client_secret, redirect_uris } = credentials.web;
+  const oauth2Client = new google.auth.OAuth2(
+    client_id,
+    client_secret,
+    redirect_uris
+  );
+  return oauth2Client;
+};
 
 class AppError extends Error {
   constructor(statusCode, message, errorType) {
