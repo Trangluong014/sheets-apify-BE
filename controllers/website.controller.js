@@ -24,6 +24,7 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const website = await Website.create({
     name,
     spreadsheetId,
+    range,
     template,
     data,
     lastUpdate,
@@ -42,13 +43,5 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
 });
 
 //Update data to Website
-
-websiteController.updateWebsite = catchAsync(async (req, res, next) => {
-  const { webId } = req.body;
-  const website = await Website.findById(webId);
-  if (website.lastUpdate < website.dbLastUpdate) {
-  }
-  return sendResponse(res, 200, true, {}, null, "success");
-});
 
 module.exports = websiteController;
