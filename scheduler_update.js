@@ -5,11 +5,12 @@ const {
   getSheetLastUpdate,
   readData,
 } = require("./controllers/googleapi.controller");
+const mongoURI = process.env.MONGO_DEV_URI;
 
 // const mongoURI = process.env.MONGO_DEV_URI;
 
 mongoose
-  .connect("mongodb+srv://sheets-apify.pzww4.mongodb.net/")
+  .connect(mongoURI)
   .then(() => {
     console.log(`DB connected`);
   })
