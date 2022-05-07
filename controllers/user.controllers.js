@@ -7,7 +7,7 @@ const userController = {};
 // user can create account with email and password
 
 userController.userRegister = catchAsync(async (req, res, next) => {
-  let { name, email, password } = req.body;
+  let { name, email, password, webId } = req.body;
 
   let user = await User.findOne({ email });
 
@@ -18,7 +18,7 @@ userController.userRegister = catchAsync(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
 
-  user = await User.create({ name, email, password });
+  user = await User.create({ name, email, password, webId });
 
   const accessToken = user.generateToken();
 
@@ -132,7 +132,7 @@ userController.updateUserPassword = catchAsync(async (req, res, next) => {
 // Owner can deactivate own account
 userController.deactivateUserAccount = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
-  const user = await user.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     currentUserId,
     { isDeleted: true },
     { new: true }

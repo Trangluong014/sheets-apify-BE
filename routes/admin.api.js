@@ -35,13 +35,13 @@ router.post(
 router.post(
   "/login",
   validate([
-    body("email,Invalid email").exists().isEmail(),
+    body("email", "Invalid email").exists().isEmail(),
     body("password", "Invalid password").exists().notEmpty(),
   ]),
   adminLogin
 );
 // 3. Admin can see a list of all admins in own website
-router.get("/all", loginRequired, adminList);
+// router.get("/all", loginRequired, adminList);
 // 4. Admin can see other admin with same website's information by id
 router.get(
   "/:id",
@@ -52,15 +52,16 @@ router.get(
 );
 // 5. Admin can see own user's information
 router.get(
-  "/profile",
-  validate([header("authorization").exists().isString()]),
+  "/me/profile",
+  // validate([header("Authorization").exists().isString()]),
   loginRequired,
   getAdminOwnInfo
 );
 // 6. Owner can update own account profile
-router.put("/profile/update", loginRequired, UpdateAdminAccount);
+router.put("/me/profile/update", loginRequired, UpdateAdminAccount);
 // 7. Owner can deactivate own account
-router.delete("/profile/deactivate", loginRequired, deactivateAdminAccount);
+router.delete("/me/deactivate", loginRequired, deactivateAdminAccount);
 // 8. Owner can update password
-router.put("/profile/password", loginRequired, updateAdminPassword);
+router.put("/me/profile/password", loginRequired, updateAdminPassword);
+
 module.exports = router;

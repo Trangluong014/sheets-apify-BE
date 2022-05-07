@@ -9,6 +9,7 @@ const adminSchema = Schema(
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true, select: false },
     isDeleted: { type: Boolean, default: false, select: false },
+    webId: { type: String },
   },
   { timestamp: true }
 );

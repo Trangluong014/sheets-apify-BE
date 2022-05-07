@@ -59,6 +59,7 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
    npm i nodemon cors bcryptjs dotenv
    npm i jsonwebtoken mongoose
    npm i googleapis
+   npm install express-validator
    ```
 
 3. Add dev script
@@ -71,8 +72,6 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
        }
    }
    ```
-
-
 
 ## The end
 

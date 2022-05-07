@@ -10,6 +10,7 @@ googleApiController.makeRedirect = catchAsync(async function (req, res, next) {
   const scopes = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.activity.readonly",
+    "https://www.googleapis.com/auth/drive",
   ];
   let authorizationUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
@@ -42,15 +43,12 @@ googleApiController.getToken = catchAsync(async function (req, res, next) {
   return sendResponse(res, 200, true, {}, null, "success");
 });
 
-googleApiController.readData = async (url, range) => {
+googleApiController.readData = async (spreadsheetId, range) => {
   const oauth2Client = googleAuth();
   let tokens = fs.readFileSync("tokens.json", "utf8");
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
-  const urlSpilt = url.split("/");
-  const spreadsheetId = urlSpilt[5];
-  console.log("spreadsheet", spreadsheetId);
   const request = {
     spreadsheetId,
     range,
@@ -68,6 +66,25 @@ googleApiController.readData = async (url, range) => {
       return data;
     });
     return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+googleApiController.getSheetLastUpdate = async (fileId) => {
+  const oauth2Client = googleAuth();
+  let tokens = fs.readFileSync("tokens.json", "utf8");
+  tokens = JSON.parse(tokens);
+  oauth2Client.setCredentials(tokens);
+  const drive = google.drive({ version: "v3", auth: oauth2Client });
+  const params = {
+    fileId,
+    fields: "trashed,modifiedTime",
+  };
+  console.log("params", params);
+  try {
+    let response = (await drive.files.get(params)).data;
+    console.log("response", response);
+    return response;
   } catch (error) {
     console.log(error);
   }

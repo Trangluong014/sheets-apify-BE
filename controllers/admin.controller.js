@@ -49,55 +49,56 @@ adminController.adminLogin = catchAsync(async (req, res, next) => {
 
   const accessToken = admin.generateToken();
 
-  return sendResponse(res, 200, true, { user, accessToken }, null, "success");
+  return sendResponse(res, 200, true, { admin, accessToken }, null, "success");
 });
 
 // Admin can see a list of all admins in own website
 
-adminController.adminList = catchAsync(async (req, res, next) => {
-  let { page, limit, ...filter } = { ...req.query };
-  page = parseInt(page) || 1;
-  limit = parseInt(limit) || 10;
-  const { currentAdminId } = req;
+// adminController.adminList = catchAsync(async (req, res, next) => {
+//   let { page, limit, ...filter } = { ...req.query };
+//   page = parseInt(page) || 1;
+//   limit = parseInt(limit) || 10;
+//   const { currentUserId } = req;
 
-  const admin = await Admin.findById({ currentAdminId });
+//   const admin = await Admin.findById(currentUserId);
+//   console.log("admin", admin);
 
-  const filterCondition = [{ webId: admin.webId }];
-  const allow = ["name", "email"];
-  allow.forEach((field) => {
-    if (filter[field]) {
-      filterCondition.push({
-        [field]: { $regex: filter[field], $option: "i" },
-      });
-    }
-  });
-  const filterCriteria = filterCondition.length
-    ? { $and: filterCondition }
-    : {};
-  const count = await Admin.countDocuments(filterCriteria);
-  const totalPage = Math.ceil(count / limit);
-  const offset = limit * (page - 1);
-  let adminList = await User.find(filterCriteria)
-    .sort({ createAt: -1 })
-    .skip(offset)
-    .limit(limit);
+//   const filterCondition = [{ webId: admin.webId }];
+//   const allow = ["name", "email"];
+//   allow.forEach((field) => {
+//     if (filter[field]) {
+//       filterCondition.push({
+//         [field]: { $regex: filter[field], $option: "i" },
+//       });
+//     }
+//   });
+//   const filterCriteria = filterCondition.length
+//     ? { $and: filterCondition }
+//     : {};
+//   const count = await Admin.countDocuments(filterCriteria);
+//   const totalPage = Math.ceil(count / limit);
+//   const offset = limit * (page - 1);
+//   let adminList = await User.find(filterCriteria)
+//     .sort({ createAt: -1 })
+//     .skip(offset)
+//     .limit(limit);
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { userList, totalPage },
-    null,
-    "Get Admin List success"
-  );
-});
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     { adminList, totalPage },
+//     null,
+//     "Get Admin List success"
+//   );
+// });
 
 // Admin can see other admin with same website's information by id
 
 adminController.getSingleAdminInfoById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { currentAdminId } = req;
-  const currentAdmin = await Admin.findById({ currentAdminId });
+  const { currentUserId } = req;
+  const currentAdmin = await Admin.findById(currentUserId);
   const admin = await Admin.findOne({ _id: id, webId: currentAdmin.webId });
   if (!admin) {
     throw new AppError(
@@ -120,8 +121,8 @@ adminController.getSingleAdminInfoById = catchAsync(async (req, res, next) => {
 // Admin can see own user's information
 
 adminController.getAdminOwnInfo = catchAsync(async (req, res, next) => {
-  const { currentAdminId } = req;
-  const admin = await Admin.findById(currentAdminId);
+  const { currentUserId } = req;
+  const admin = await Admin.findById(currentUserId);
   if (!admin) {
     throw new AppError(
       404,
@@ -143,8 +144,8 @@ adminController.getAdminOwnInfo = catchAsync(async (req, res, next) => {
 // Owner can update own account profile
 
 adminController.UpdateAdminAccount = catchAsync(async (req, res, next) => {
-  const { currentAdminId } = req;
-  const admin = await Admin.findById(currentAdminId);
+  const { currentUserId } = req;
+  const admin = await Admin.findById(currentUserId);
   if (!admin) {
     throw new AppError(
       404,
@@ -165,14 +166,14 @@ adminController.UpdateAdminAccount = catchAsync(async (req, res, next) => {
     true,
     { admin },
     null,
-    "Update Admin Infor success"
+    "Update Admin Information success"
   );
 });
 
 // Owner can update password
 adminController.updateAdminPassword = catchAsync(async (req, res, next) => {
-  const { currentAdminId } = req;
-  const admin = await Admin.findById(currentAdminId);
+  const { currentUserId } = req;
+  const admin = await Admin.findById(currentUserId);
   let { newPassword, password } = req.body;
   if (!admin) {
     throw new AppError(
@@ -208,9 +209,9 @@ adminController.updateAdminPassword = catchAsync(async (req, res, next) => {
 
 // Owner can deactivate own account
 adminController.deactivateAdminAccount = catchAsync(async (req, res, next) => {
-  const { currentAdminId } = req;
+  const { currentUserId } = req;
   const admin = await Admin.findByIdAndUpdate(
-    currentAdminId,
+    currentUserId,
     { isDeleted: true },
     { new: true }
   );
