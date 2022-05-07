@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 require("dotenv").config();
 const Website = require("./models/Website");
 const mongoose = require("mongoose");
@@ -8,10 +6,10 @@ const {
   readData,
 } = require("./controllers/googleapi.controller");
 
-const mongoURI = process.env.MONGO_DEV_URI;
+// const mongoURI = process.env.MONGO_DEV_URI;
 
 mongoose
-  .connect(mongoURI)
+  .connect("mongodb://127.0.0.1:27017/sheets-apify")
   .then(() => {
     console.log(`DB connected`);
   })
