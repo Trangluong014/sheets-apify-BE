@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const cool = require("cool-ascii-faces");
 
+router.get("/cool", (req, res) => res.send(cool()));
 const googleRoutes = require("./google.api");
 router.use("/google", googleRoutes);
 

@@ -51,6 +51,7 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
    npx express-generator --no-view
    npm install
    touch .gitignore .env
+   heroku local -p 8000
    ```
 
 2. Install project dependencies
