@@ -9,7 +9,7 @@ const {
 // const mongoURI = process.env.MONGO_DEV_URI;
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/sheets-apify")
+  .connect("mongodb+srv://sheets-apify.pzww4.mongodb.net/")
   .then(() => {
     console.log(`DB connected`);
   })
