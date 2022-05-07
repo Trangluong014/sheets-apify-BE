@@ -19,7 +19,7 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const data = await readData(spreadsheetId, range);
   const lastUpdate = Date.now();
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
-  dbLastUpdate = dbLastUpdate.modifiedTime;
+  dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
   const website = await Website.create({
     name,
