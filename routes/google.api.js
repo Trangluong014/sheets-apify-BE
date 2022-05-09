@@ -16,7 +16,7 @@ router.get("/O2Auth", getToken);
 
 router.get("/spreadsheet/data", async function (req, res, next) {
   const url =
-    "https://docs.google.com/spreadsheets/d/1MJAiNfjpCGmvxr5zxrkAwyRRM5q9wdNKAf17t6HNqfw/edit#gid=0";
+    "https://docs.google.com/spreadsheets/d/1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY/edit#gid=0";
   const range = "Sheet1";
   let data = await readData(url, range);
   sendResponse(res, 200, true, { data }, null, "success");

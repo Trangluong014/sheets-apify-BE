@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const productSchema = Schema(
   {
-    author: { type: Schema.Types.ObjectId, require: true, ref: "Users" }, // User
+    author: { type: Schema.Types.ObjectId, require: true, ref: "Users" },
+    spreadsheetId: { type: String, require: true }, // User
     name: { type: String, require: true },
     price: { type: Schema.Types.Decimal128, require: true },
     saleprice: { type: Schema.Types.Decimal128 },

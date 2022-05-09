@@ -60,12 +60,7 @@ googleApiController.readData = async (spreadsheetId, range) => {
   try {
     let response = (await sheets.spreadsheets.values.get(request)).data;
     response = response.values;
-    const data = response.map((array, index) => {
-      let data = {};
-      data[array[0]] = array.slice(1);
-      return data;
-    });
-    return data;
+    return response;
   } catch (error) {
     console.log(error);
   }
