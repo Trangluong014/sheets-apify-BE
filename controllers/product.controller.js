@@ -23,11 +23,11 @@ productController.createProduct = catchAsync(async (req, res, next) => {
   data.slice(1).forEach(async (e, index) => {
     try {
       const name = e[0];
-      const price = e[1];
+      const price = parseFloat(e[1]);
       const SKU = e[2];
       const image = e[3];
       const description = e[4];
-      const inventory = e[5];
+      const inventory = parseInt(e[5]);
       const category = e[6];
       const product = await Product.create({
         author: admin._id,
@@ -49,6 +49,58 @@ productController.createProduct = catchAsync(async (req, res, next) => {
   });
 
   sendResponse(res, 200, true, { productList }, null, "create Product success");
+});
+
+productController.getAllProduct = catchAsync(async (req, res, next) => {
+  let { page, limit, sort, ...filter } = { ...req.query };
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
+  const { spreadsheetId } = req.params;
+
+  const filterCondition = [{ spreadsheetId }];
+  const allowFilter = ["name", "category"];
+  allowFilter.forEach((field) => {
+    if (filter[field] !== undefined) {
+      filterCondition.push({
+        [field]: { $regex: filter[field], $options: "i" },
+      });
+    }
+  });
+  const filterCriteria = filterCondition.length
+    ? { $and: filterCondition }
+    : {};
+
+  let sortCondition = { createAt: -1 };
+  if (sort) {
+    if (sort === "priceasc") {
+      sortCondition = { ...sortCondition, price: -1 };
+    } else if (sort === "pricedsc") {
+      sortCondition = { ...sortCondition, price: 1 };
+    }
+  }
+
+  const sortCriteria = sortCondition.length ? sortCondition : {};
+
+  console.log("filter", filterCondition);
+
+  console.log("sort", sortCondition);
+  const count = await Product.countDocuments(filter);
+  const totalPage = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
+
+  const productList = await Product.find(filterCriteria)
+    .sort(sortCriteria)
+    .skip(offset)
+    .limit(limit);
+
+  return sendResponse(
+    res,
+    200,
+    true,
+    { productList, totalPage },
+    null,
+    "Get Product Successfully"
+  );
 });
 
 module.exports = productController;
