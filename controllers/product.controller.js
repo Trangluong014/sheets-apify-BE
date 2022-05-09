@@ -7,7 +7,7 @@ const { readData } = require("./googleapi.controller");
 const productController = {};
 
 //Create Products
-productController.create = catchAsync(async (req, res, next) => {
+productController.createProduct = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
 
   let admin = await User.findById(currentUserId);
@@ -16,7 +16,8 @@ productController.create = catchAsync(async (req, res, next) => {
   const spreadsheetId = urlSpilt[5];
 
   let data = await readData(spreadsheetId, range);
-  data.forEach(async (e, index) => {
+  console.log("data", data[0]);
+  data.slice(1).forEach(async (e, index) => {
     const name = e[0];
     const price = e[1];
     const SKU = e[2];

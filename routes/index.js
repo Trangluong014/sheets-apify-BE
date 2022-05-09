@@ -12,6 +12,9 @@ router.use("/admin", adminRoutes);
 const websiteRoutes = require("./website.api");
 router.use("/website", websiteRoutes);
 
+const productRoutes = require("./product.api");
+router.use("/product", productRoutes);
+
 const userRoutes = require("./users.api.js");
 router.use("/user", userRoutes);
 
