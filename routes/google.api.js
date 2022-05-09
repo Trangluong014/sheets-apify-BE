@@ -18,8 +18,10 @@ router.get("/spreadsheet/data", async function (req, res, next) {
   const url =
     "https://docs.google.com/spreadsheets/d/1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY/edit#gid=0";
   const range = "Sheet1";
-  let data = await readData(url, range);
-  sendResponse(res, 200, true, { data }, null, "success");
+  const urlSpilt = url.split("/");
+  const spreadsheetId = urlSpilt[5];
+  let data = await readData(spreadsheetId, range);
+  sendResponse(res, 200, true, { data }, null, "get data success");
 });
 
 router.get("/drive/update", async function (req, res, next) {
