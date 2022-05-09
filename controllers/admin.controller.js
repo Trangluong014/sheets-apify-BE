@@ -1,237 +1,183 @@
-const bcrypt = require("bcryptjs");
-const { catchAsync, sendResponse, AppError } = require("../helpers/utils");
-const Admin = require("../models/Admin");
+// const bcrypt = require("bcryptjs");
+// const { catchAsync, sendResponse, AppError } = require("../helpers/utils");
+// const User = require("../models/User");
 
-const adminController = {};
+// const adminController = {};
 
-// Admin can create account with email and password
+// // user can create account with email and password
 
-adminController.adminRegister = catchAsync(async (req, res, next) => {
-  let { name, email, password } = req.body;
+// userController.userRegister = catchAsync(async (req, res, next) => {
+//   let { name, email, password, webId } = req.body;
 
-  let admin = await Admin.findOne({ email });
+//   let user = await User.findOne({ email });
 
-  if (admin) {
-    throw new AppError(409, "User already exits", "Admin register error");
-  }
+//   if (user) {
+//     throw new AppError(409, "User already exits", "User register error");
+//   }
 
-  const salt = await bcrypt.genSalt(10);
-  password = await bcrypt.hash(password, salt);
+//   const salt = await bcrypt.genSalt(10);
+//   password = await bcrypt.hash(password, salt);
 
-  admin = await Admin.create({ name, email, password });
+//   user = await User.create({ name, email, password, webId });
 
-  const accessToken = admin.generateToken();
-
-  return sendResponse(
-    res,
-    200,
-    true,
-    { admin, accessToken },
-    null,
-    "Admin register success"
-  );
-});
-
-// Admin can login with email and password
-
-adminController.adminLogin = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
-
-  const admin = await Admin.findOne({ email }, "+password");
-
-  if (!admin) {
-    throw new AppError(400, "User not found", "Admin Login Error");
-  }
-  const isMatch = await bcrypt.compare(password, admin.password);
-  if (!isMatch) {
-    throw new AppError(400, "Invalid credential", "Admin Login Error");
-  }
-
-  const accessToken = admin.generateToken();
-
-  return sendResponse(res, 200, true, { admin, accessToken }, null, "success");
-});
-
-// Admin can see a list of all admins in own website
-
-// adminController.adminList = catchAsync(async (req, res, next) => {
-//   let { page, limit, ...filter } = { ...req.query };
-//   page = parseInt(page) || 1;
-//   limit = parseInt(limit) || 10;
-//   const { currentUserId } = req;
-
-//   const admin = await Admin.findById(currentUserId);
-//   console.log("admin", admin);
-
-//   const filterCondition = [{ webId: admin.webId }];
-//   const allow = ["name", "email"];
-//   allow.forEach((field) => {
-//     if (filter[field]) {
-//       filterCondition.push({
-//         [field]: { $regex: filter[field], $option: "i" },
-//       });
-//     }
-//   });
-//   const filterCriteria = filterCondition.length
-//     ? { $and: filterCondition }
-//     : {};
-//   const count = await Admin.countDocuments(filterCriteria);
-//   const totalPage = Math.ceil(count / limit);
-//   const offset = limit * (page - 1);
-//   let adminList = await User.find(filterCriteria)
-//     .sort({ createAt: -1 })
-//     .skip(offset)
-//     .limit(limit);
+//   const accessToken = user.generateToken();
 
 //   return sendResponse(
 //     res,
 //     200,
 //     true,
-//     { adminList, totalPage },
+//     { user, accessToken },
 //     null,
-//     "Get Admin List success"
+//     "User register success"
 //   );
 // });
 
-// Admin can see other admin with same website's information by id
+// // user can login with email and password
 
-adminController.getSingleAdminInfoById = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const { currentUserId } = req;
-  const currentAdmin = await Admin.findById(currentUserId);
-  const admin = await Admin.findOne({ _id: id, webId: currentAdmin.webId });
-  if (!admin) {
-    throw new AppError(
-      404,
-      "User Not Found",
-      "Get single Admin Information Error"
-    );
-  }
+// userController.userLogin = catchAsync(async (req, res, next) => {
+//   const { email, password } = req.body;
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { admin },
-    null,
-    "Get single admin information success"
-  );
-});
+//   const user = await User.findOne({ email }, "+password");
 
-// Admin can see own user's information
+//   if (!user) {
+//     throw new AppError(400, "User not found", "user Login Error");
+//   }
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   if (!isMatch) {
+//     throw new AppError(400, "Invalid credential", "user Login Error");
+//   }
 
-adminController.getAdminOwnInfo = catchAsync(async (req, res, next) => {
-  const { currentUserId } = req;
-  const admin = await Admin.findById(currentUserId);
-  if (!admin) {
-    throw new AppError(
-      404,
-      "User Not Found",
-      "Get Admin own information error"
-    );
-  }
+//   const accessToken = user.generateToken();
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { admin },
-    null,
-    "Get Admin own information success"
-  );
-});
+//   return sendResponse(res, 200, true, { user, accessToken }, null, "success");
+// });
 
-// Owner can update own account profile
+// // User can see other User with same website's information by id
 
-adminController.UpdateAdminAccount = catchAsync(async (req, res, next) => {
-  const { currentUserId } = req;
-  const admin = await Admin.findById(currentUserId);
-  if (!admin) {
-    throw new AppError(
-      404,
-      "User Not Found",
-      "Get Admin own information error"
-    );
-  }
-  const allows = ["name"];
-  allows.forEach((field) => {
-    if (req.body[field]) {
-      admin[field] = req.body[field];
-    }
-  });
-  await admin.save();
-  return sendResponse(
-    res,
-    200,
-    true,
-    { admin },
-    null,
-    "Update Admin Information success"
-  );
-});
+// userController.getSingleUserInfoById = catchAsync(async (req, res, next) => {
+//   const { id } = req.params;
+//   const { currentUserId } = req;
+//   const currentUser = await User.findById(currentUserId);
+//   const user = await User.findOne({ _id: id, webId: currentUser.webId });
+//   if (!user) {
+//     throw new AppError(
+//       404,
+//       "User Not Found",
+//       "Get single User Information Error"
+//     );
+//   }
 
-// Owner can update password
-adminController.updateAdminPassword = catchAsync(async (req, res, next) => {
-  const { currentUserId } = req;
-  const admin = await Admin.findById(currentUserId);
-  let { newPassword, password } = req.body;
-  if (!admin) {
-    throw new AppError(
-      404,
-      "User Not Found",
-      "Get Admin own information error"
-    );
-  }
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     { user },
+//     null,
+//     "Get single User information success"
+//   );
+// });
 
-  if (newPassword === password) {
-    throw new AppError(
-      404,
-      "New Password must be different from current password, please change",
-      "Update password error"
-    );
-  }
+// // User can see own user's information
 
-  const salt = await bcrypt.genSalt(10);
-  newPassword = await bcrypt.hash(newPassword, salt);
-  admin.password = newPassword;
+// userController.getUserOwnInfo = catchAsync(async (req, res, next) => {
+//   const { currentUserId } = req;
+//   const user = await User.findById(currentUserId);
+//   if (!user) {
+//     throw new AppError(404, "User Not Found", "Get user own information error");
+//   }
 
-  await admin.save();
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     { user },
+//     null,
+//     "Get user own information success"
+//   );
+// });
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { admin },
-    null,
-    "update admin password success"
-  );
-});
+// // Owner can update own account profile
 
-// Owner can deactivate own account
-adminController.deactivateAdminAccount = catchAsync(async (req, res, next) => {
-  const { currentUserId } = req;
-  const admin = await Admin.findByIdAndUpdate(
-    currentUserId,
-    { isDeleted: true },
-    { new: true }
-  );
-  if (!admin) {
-    throw new AppError(404, "User Not Found", "Deactive Admin Account error");
-  }
+// userController.UpdateUserAccount = catchAsync(async (req, res, next) => {
+//   const { currentUserId } = req;
+//   const user = await User.findById(currentUserId);
+//   if (!user) {
+//     throw new AppError(404, "User Not Found", "Get user own information error");
+//   }
+//   const allows = ["name"];
+//   allows.forEach((field) => {
+//     if (req.body[field]) {
+//       user[field] = req.body[field];
+//     }
+//   });
+//   await user.save();
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     { user },
+//     null,
+//     "Update user Information success"
+//   );
+// });
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    {},
-    null,
-    "deactivate admin account success"
-  );
-});
+// // Owner can update password
+// userController.updateUserPassword = catchAsync(async (req, res, next) => {
+//   const { currentUserId } = req;
+//   const user = await User.findById(currentUserId);
+//   let { newPassword, password } = req.body;
+//   if (!user) {
+//     throw new AppError(404, "User Not Found", "Get user own information error");
+//   }
 
-// Admin can see list of their own websites.
-adminController.register = catchAsync(async (req, res, next) => {
-  return sendResponse(res, 200, true, {}, null, "success");
-});
+//   if (newPassword === password) {
+//     throw new AppError(
+//       404,
+//       "New Password must be different from current password, please change",
+//       "Update password error"
+//     );
+//   }
 
-module.exports = adminController;
+//   const salt = await bcrypt.genSalt(10);
+//   newPassword = await bcrypt.hash(newPassword, salt);
+//   user.password = newPassword;
+
+//   await user.save();
+
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     { user },
+//     null,
+//     "update user password success"
+//   );
+// });
+
+// // Owner can deactivate own account
+// userController.deactivateUserAccount = catchAsync(async (req, res, next) => {
+//   const { currentUserId } = req;
+//   const user = await User.findByIdAndUpdate(
+//     currentUserId,
+//     { isDeleted: true },
+//     { new: true }
+//   );
+//   if (!user) {
+//     throw new AppError(404, "User Not Found", "Deactive user Account error");
+//   }
+
+//   return sendResponse(
+//     res,
+//     200,
+//     true,
+//     {},
+//     null,
+//     "deactivate user account success"
+//   );
+// });
+// // User can see list of their own websites.
+// userController.register = catchAsync(async (req, res, next) => {
+//   return sendResponse(res, 200, true, {}, null, "success");
+// });
+
+// module.exports = adminController;

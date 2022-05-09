@@ -54,7 +54,7 @@ googleApiController.readData = async (spreadsheetId, range) => {
     range,
     valueRenderOption: "FORMATTED_VALUE",
     dateTimeRenderOption: "FORMATTED_STRING",
-    majorDimension: "COLUMNS",
+    majorDimension: "ROWS",
   };
   console.log("request", request);
   try {

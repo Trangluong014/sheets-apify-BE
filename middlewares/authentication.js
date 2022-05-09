@@ -15,6 +15,7 @@ authMiddleware.loginRequired = (req, res, next) => {
       throw new AppError(401, "Token Error", "Login Require Error");
     }
     req.currentUserId = payload._id;
+    req.currentUserRole = payload.role;
     next();
   });
 };

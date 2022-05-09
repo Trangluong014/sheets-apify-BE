@@ -1,18 +1,19 @@
 const express = require("express");
-const {
-  adminRegister,
-  adminLogin,
-  adminList,
-  getSingleAdminInfoById,
-  getAdminOwnInfo,
-  UpdateAdminAccount,
-  deactivateAdminAccount,
-  updateAdminPassword,
-} = require("../controllers/admin.controller");
 const router = express.Router();
 const { validate, checkObjectId } = require("../middlewares/validator");
 const { body, param, header } = require("express-validator");
 const { loginRequired } = require("../middlewares/authentication");
+const {
+  userRegister,
+  userLogin,
+  getSingleUserInfoById,
+  getUserOwnInfo,
+  UpdateUserAccount,
+  deactivateUserAccount,
+  updateUserPassword,
+  updateUserAccount,
+} = require("../controllers/user.controllers");
+const { isAdmin } = require("../middlewares/authorization");
 
 // 1. Admin can create account with email and password
 /**
@@ -29,7 +30,7 @@ router.post(
     body("email", "Invalid email").exists().isEmail(),
     body("password", "Invalid password").exists().notEmpty(),
   ]),
-  adminRegister
+  userRegister
 );
 // 2. Admin can login with email and password
 router.post(
@@ -38,7 +39,7 @@ router.post(
     body("email", "Invalid email").exists().isEmail(),
     body("password", "Invalid password").exists().notEmpty(),
   ]),
-  adminLogin
+  userLogin
 );
 // 3. Admin can see a list of all admins in own website
 // router.get("/all", loginRequired, adminList);
@@ -48,20 +49,20 @@ router.get(
 
   validate([param("id").exists().isString().custom(checkObjectId)]),
   loginRequired,
-  getSingleAdminInfoById
+  getSingleUserInfoById
 );
 // 5. Admin can see own user's information
 router.get(
   "/me/profile",
   // validate([header("Authorization").exists().isString()]),
   loginRequired,
-  getAdminOwnInfo
+  getUserOwnInfo
 );
 // 6. Owner can update own account profile
-router.put("/me/profile/update", loginRequired, UpdateAdminAccount);
+router.put("/me/profile/update", loginRequired, updateUserAccount);
 // 7. Owner can deactivate own account
-router.delete("/me/deactivate", loginRequired, deactivateAdminAccount);
+router.delete("/me/deactivate", loginRequired, deactivateUserAccount);
 // 8. Owner can update password
-router.put("/me/profile/password", loginRequired, updateAdminPassword);
+router.put("/me/profile/password", loginRequired, updateUserPassword);
 
 module.exports = router;

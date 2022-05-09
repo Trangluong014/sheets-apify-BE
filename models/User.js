@@ -9,7 +9,8 @@ const userSchema = Schema(
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true, select: false },
     isDeleted: { type: Boolean, default: false, select: false },
-    webId: { type: String, require: true },
+    webId: { type: String },
+    role: { type: String, enum: ["Admin", "Customer"] },
   },
   { timestamp: true }
 );
@@ -22,9 +23,13 @@ userSchema.methods.toJSON = function () {
 };
 
 userSchema.methods.generateToken = function () {
-  const accessToken = jwt.sign({ _id: this._id }, JWT_SECRET_KEY, {
-    expiresIn: "1d",
-  });
+  const accessToken = jwt.sign(
+    { _id: this._id, role: this.role },
+    JWT_SECRET_KEY,
+    {
+      expiresIn: "1d",
+    }
+  );
   return accessToken;
 };
 

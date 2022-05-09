@@ -7,7 +7,7 @@ const userController = {};
 // user can create account with email and password
 
 userController.userRegister = catchAsync(async (req, res, next) => {
-  let { name, email, password, webId } = req.body;
+  let { name, email, password, webId, role } = req.body;
 
   let user = await User.findOne({ email });
 
@@ -18,7 +18,7 @@ userController.userRegister = catchAsync(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
 
-  user = await User.create({ name, email, password, webId });
+  user = await User.create({ name, email, password, webId, role });
 
   const accessToken = user.generateToken();
 
@@ -52,7 +52,32 @@ userController.userLogin = catchAsync(async (req, res, next) => {
   return sendResponse(res, 200, true, { user, accessToken }, null, "success");
 });
 
-// user can see own user's information
+// User can see other User with same website's information by id
+
+userController.getSingleUserInfoById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { currentUserId } = req;
+  const currentUser = await User.findById(currentUserId);
+  const user = await User.findOne({ _id: id, webId: currentUser.webId });
+  if (!user) {
+    throw new AppError(
+      404,
+      "User Not Found",
+      "Get single User Information Error"
+    );
+  }
+
+  return sendResponse(
+    res,
+    200,
+    true,
+    { user },
+    null,
+    "Get single User information success"
+  );
+});
+
+// User can see own user's information
 
 userController.getUserOwnInfo = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
@@ -73,7 +98,7 @@ userController.getUserOwnInfo = catchAsync(async (req, res, next) => {
 
 // Owner can update own account profile
 
-userController.UpdateUserAccount = catchAsync(async (req, res, next) => {
+userController.updateUserAccount = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
   const user = await User.findById(currentUserId);
   if (!user) {
@@ -149,6 +174,10 @@ userController.deactivateUserAccount = catchAsync(async (req, res, next) => {
     null,
     "deactivate user account success"
   );
+});
+// User can see list of their own websites.
+userController.register = catchAsync(async (req, res, next) => {
+  return sendResponse(res, 200, true, {}, null, "success");
 });
 
 module.exports = userController;

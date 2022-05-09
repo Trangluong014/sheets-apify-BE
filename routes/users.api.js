@@ -6,9 +6,9 @@ const {
   userRegister,
   userLogin,
   getUserOwnInfo,
-  UpdateUserAccount,
   deactivateUserAccount,
   updateUserPassword,
+  updateUserAccount,
 } = require("../controllers/user.controllers");
 const { loginRequired } = require("../middlewares/authentication");
 
@@ -39,7 +39,7 @@ router.get(
   getUserOwnInfo
 );
 // 4. Owner can update own account profile
-router.put("/profile/update", loginRequired, UpdateUserAccount);
+router.put("/profile/update", loginRequired, updateUserAccount);
 // 5. Owner can deactivate own account
 router.delete("/profile/deactivate", loginRequired, deactivateUserAccount);
 // 6. Owner update password
