@@ -1,8 +1,9 @@
-const { admin } = require("googleapis/build/src/apis/admin");
 const { catchAsync, sendResponse } = require("../helpers/utils");
 const Admin = require("../models/Admin");
+const Product = require("../models/Product");
+const User = require("../models/User");
 const Website = require("../models/Website");
-const { readData, getSheetLastUpdate } = require("./googleapi.controller");
+const { getSheetLastUpdate } = require("./googleapi.controller");
 
 const websiteController = {};
 
@@ -11,12 +12,14 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const { name, url, template, range } = req.body;
   const { currentUserId } = req;
 
-  let admin = await Admin.findById(currentUserId);
+  let admin = await User.findById(currentUserId);
 
   const urlSpilt = url.split("/");
   const spreadsheetId = urlSpilt[5];
 
-  const data = await readData(spreadsheetId, range);
+  let data = [];
+  const productList = await Product.find({ spreadsheetId });
+  data = productList.map((product) => product._id);
   const lastUpdate = Date.now();
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
   dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);

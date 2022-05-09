@@ -7,11 +7,9 @@ const productSchema = Schema(
     spreadsheetId: { type: String, require: true }, // User
     name: { type: String, require: true },
     price: { type: Schema.Types.Decimal128, require: true },
-    saleprice: { type: Schema.Types.Decimal128 },
     SKU: { type: String, require: true },
-    image: { type: String },
+    image: { type: String, require: true },
     description: { type: String, require: true },
-    size: { type: String },
     inventory: { type: Schema.Types.Number, require: true },
     category: { type: String, require: true },
   },
