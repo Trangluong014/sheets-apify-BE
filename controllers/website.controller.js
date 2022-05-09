@@ -1,4 +1,4 @@
-const { catchAsync, sendResponse } = require("../helpers/utils");
+const { catchAsync, sendResponse, AppError } = require("../helpers/utils");
 const Admin = require("../models/Admin");
 const Product = require("../models/Product");
 const User = require("../models/User");
@@ -16,7 +16,13 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
 
   const urlSpilt = url.split("/");
   const spreadsheetId = urlSpilt[5];
-
+  let website = await Website.findOne({ spreadsheetId });
+  if (website) {
+    throw new AppError(
+      409,
+      "Website is already generated from this spreadsheet"
+    );
+  }
   let data = [];
   const productList = await Product.find({ spreadsheetId });
   data = productList.map((product) => product._id);
@@ -24,7 +30,8 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
   dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
-  const website = await Website.create({
+  website = await Website.create({
+    author: admin._id,
     name,
     spreadsheetId,
     range,
