@@ -18,6 +18,9 @@ router.use("/web", webRoutes);
 const itemRoutes = require("./item.api");
 router.use("/item", itemRoutes);
 
+const productRoutes = require("./product.api");
+router.use("/product", productRoutes);
+
 const userRoutes = require("./users.api.js");
 router.use("/user", userRoutes);
 

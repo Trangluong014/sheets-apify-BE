@@ -1,9 +1,11 @@
+const mongoose = require("mongoose");
 const {
   catchAsync,
   sendResponse,
   AppError,
   parseDynamic,
 } = require("../helpers/utils");
+const { db } = require("../models/Web");
 const User = require("../models/User");
 const Web = require("../models/Web");
 const { getSheetLastUpdate, readData } = require("./googleapi.controller");
@@ -26,16 +28,11 @@ webController.createWeb = catchAsync(async (req, res, next) => {
       "Website is already generated from this spreadsheet"
     );
   }
-  let data = await readData(spreadsheetId, range);
-  let header = data[0];
-  console.log("header", header);
-  data = data.slice(1).map((e, index) => {
-    const obj = {};
-    for (let i = 0; i < e.length; i++) {
-      obj[header[i]] = parseDynamic(e[i]);
-    }
-    return obj;
-  });
+  const itemList = await db
+    .collection("items")
+    .find({ spreadsheetId })
+    .toArray();
+  data = itemList.map((item) => item._id);
 
   const lastUpdate = Date.now();
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);

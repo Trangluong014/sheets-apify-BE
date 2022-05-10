@@ -1,18 +1,15 @@
 const express = require("express");
 const { body } = require("express-validator");
 const {
-  createItem,
-  getAllItem,
-  deleteItem,
-} = require("../controllers/item.controller");
+  createProduct,
+  getAllProduct,
+} = require("../controllers/product.controller");
 const { loginRequired } = require("../middlewares/authentication");
 const { isAdmin } = require("../middlewares/authorization");
 const { validate } = require("../middlewares/validator");
 const router = express.Router();
 
-router.post("/create", loginRequired, createItem);
+router.post("/create", loginRequired, createProduct);
 
-router.get("/:spreadsheetId", loginRequired, getAllItem);
-
-router.delete("/:spreadsheetId/delete", loginRequired, deleteItem);
+router.get("/:spreadsheetId", loginRequired, getAllProduct);
 module.exports = router;

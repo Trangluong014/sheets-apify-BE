@@ -56,7 +56,7 @@ googleApiController.readData = async (spreadsheetId, range) => {
     dateTimeRenderOption: "FORMATTED_STRING",
     majorDimension: "ROWS",
   };
-  console.log("request", request);
+
   try {
     let response = (await sheets.spreadsheets.values.get(request)).data;
     response = response.values;
@@ -76,10 +76,10 @@ googleApiController.getSheetLastUpdate = async (fileId) => {
     fileId,
     fields: "trashed,modifiedTime",
   };
-  console.log("params", params);
+
   try {
     let response = (await drive.files.get(params)).data;
-    console.log("response", response);
+
     return response;
   } catch (error) {
     console.log(error);

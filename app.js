@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 /* DB Connection */
-mongoose
+const db = mongoose
   .connect(mongoURI)
   .then(() => {
     console.log(`DB connected`);
