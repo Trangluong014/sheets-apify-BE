@@ -1,13 +1,12 @@
-const { redirect } = require("express/lib/response");
-const { catchAsync, sendResponse } = require("../helpers/utils");
-const Product = require("../models/Product");
+const { catchAsync, sendResponse, parseDynamic } = require("../helpers/utils");
+const Item = require("../models/Item");
 const User = require("../models/User");
 const { readData } = require("./googleapi.controller");
 
-const productController = {};
+const itemController = {};
 
-//Create Products
-productController.createProduct = catchAsync(async (req, res, next) => {
+//Create Items
+itemController.createItem = catchAsync(async (req, res, next) => {
   const { currentUserId } = req;
   // const { url, range } = req.body;
 
@@ -19,39 +18,29 @@ productController.createProduct = catchAsync(async (req, res, next) => {
   const urlSpilt = url.split("/");
   const spreadsheetId = urlSpilt[5];
   let data = await readData(spreadsheetId, range);
-  const productList = [];
-  data.slice(1).forEach(async (e, index) => {
-    try {
-      const name = e[0];
-      const price = parseFloat(e[1]);
-      const SKU = e[2];
-      const image = e[3];
-      const description = e[4];
-      const inventory = parseInt(e[5]);
-      const category = e[6];
-      const product = await Product.create({
-        author: admin._id,
-        spreadsheetId,
-        name,
-        price,
-        SKU,
-        image,
-        description,
-        inventory,
-        category,
-      });
-      productList.push(product);
 
-      return productList;
+  const header = data[0];
+  const promises = data.slice(1).forEach(async (e, index) => {
+    try {
+      const obj = {};
+      for (let i = 0; i < e.length; i++) {
+        obj.author = admin_.id;
+        obj.spreadsheetId = spreadsheetId;
+        obj[header[i]] = parseDynamic(e[i]);
+      }
+      return obj;
+      await Item.create({
+        obj,
+      });
     } catch (error) {
       console.log(error);
     }
   });
 
-  sendResponse(res, 200, true, { productList }, null, "create Product success");
+  sendResponse(res, 200, true, {}, null, "create Item success");
 });
 
-productController.getAllProduct = catchAsync(async (req, res, next) => {
+itemController.getAllItem = catchAsync(async (req, res, next) => {
   let { page, limit, sort, ...filter } = { ...req.query };
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
@@ -84,11 +73,11 @@ productController.getAllProduct = catchAsync(async (req, res, next) => {
   console.log("filter", filterCondition);
 
   console.log("sort", sortCondition);
-  const count = await Product.countDocuments(filter);
+  const count = await Item.countDocuments(filter);
   const totalPage = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
-  const productList = await Product.find(filterCriteria)
+  const ItemList = await Item.find(filterCriteria)
     .sort(sortCriteria)
     .skip(offset)
     .limit(limit);
@@ -97,10 +86,10 @@ productController.getAllProduct = catchAsync(async (req, res, next) => {
     res,
     200,
     true,
-    { productList, totalPage },
+    { ItemList, totalPage },
     null,
-    "Get Product Successfully"
+    "Get Item Successfully"
   );
 });
 
-module.exports = productController;
+module.exports = itemController;

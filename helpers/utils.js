@@ -45,6 +45,17 @@ utilsHelper.googleAuth = () => {
   return oauth2Client;
 };
 
+utilsHelper.parseDynamic = (value) => {
+  const FLOAT = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+  const ISO_DATE =
+    /(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))|(\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z))/;
+  if (value === "true" || value === "TRUE") return true;
+  else if (value === "false" || value === "FALSE") return false;
+  else if (FLOAT.test(value)) return parseFloat(value);
+  else if (ISO_DATE.test(value)) return new Date(value);
+  else return value === "" ? null : value;
+};
+
 class AppError extends Error {
   constructor(statusCode, message, errorType) {
     super(message);

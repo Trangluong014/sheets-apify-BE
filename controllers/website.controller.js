@@ -1,6 +1,5 @@
 const { catchAsync, sendResponse, AppError } = require("../helpers/utils");
-const Admin = require("../models/Admin");
-const Product = require("../models/Product");
+const Item = require("../models/Item");
 const User = require("../models/User");
 const Website = require("../models/Website");
 const { getSheetLastUpdate } = require("./googleapi.controller");
@@ -24,8 +23,8 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
     );
   }
   let data = [];
-  const productList = await Product.find({ spreadsheetId });
-  data = productList.map((product) => product._id);
+  const itemList = await Item.find({ spreadsheetId });
+  data = itemList.map((item) => item._id);
   const lastUpdate = Date.now();
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
   dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);

@@ -8,7 +8,12 @@ const {
   readData,
   getSheetLastUpdate,
 } = require("../controllers/googleapi.controller");
-const { sendResponse, AppError, catchAsync } = require("../helpers/utils");
+const {
+  sendResponse,
+  AppError,
+  catchAsync,
+  parseDynamic,
+} = require("../helpers/utils");
 
 router.get("/redirect", makeRedirect);
 
@@ -21,6 +26,15 @@ router.get("/spreadsheet/data", async function (req, res, next) {
   const urlSpilt = url.split("/");
   const spreadsheetId = urlSpilt[5];
   let data = await readData(spreadsheetId, range);
+  let header = data[0];
+  console.log("header", header);
+  data = data.slice(1).map((e, index) => {
+    const obj = {};
+    for (let i = 0; i < e.length; i++) {
+      obj[header[i]] = parseDynamic(e[i]);
+    }
+    return obj;
+  });
   sendResponse(res, 200, true, { data }, null, "get data success");
 });
 
