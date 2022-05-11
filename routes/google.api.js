@@ -38,8 +38,9 @@ router.get("/spreadsheet/data", async function (req, res, next) {
   sendResponse(res, 200, true, { data }, null, "get data success");
 });
 
-router.get("/drive/update", async function (req, res, next) {
-  const fileId = "1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY";
+router.get("/:fileId/drive/update", async function (req, res, next) {
+  const { fileId } = req.params;
+  console.log(fileId);
   let data = await getSheetLastUpdate(fileId);
   sendResponse(res, 200, true, { data }, null, "success");
 });

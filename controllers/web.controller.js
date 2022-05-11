@@ -5,7 +5,8 @@ const {
   AppError,
   parseDynamic,
 } = require("../helpers/utils");
-const { db } = require("../models/Web");
+// const { db } = require("../models/Web");
+const db = mongoose.connection;
 const User = require("../models/User");
 const Web = require("../models/Web");
 const { getSheetLastUpdate, readData } = require("./googleapi.controller");

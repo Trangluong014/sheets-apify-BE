@@ -1,22 +1,23 @@
 const mongoose = require("mongoose");
 const { catchAsync, sendResponse, parseDynamic } = require("../helpers/utils");
-const { db } = require("../models/Web");
+// const { db } = require("../models/Web");
 
 const User = require("../models/User");
 const { readData } = require("./googleapi.controller");
 
 const itemController = {};
+const DELIMITER = "__";
 
+const db = mongoose.connection;
 //Create Items
 
 itemController.createItem = catchAsync(async (req, res, next) => {
-  const { url, range } = req.body;
+  const { range } = req.body;
   const { currentUserId } = req;
+  const { spreadsheetId } = req.params;
 
   let admin = await User.findById(currentUserId);
 
-  const urlSpilt = url.split("/");
-  const spreadsheetId = urlSpilt[5];
   let data = await readData(spreadsheetId, range);
   let header = data[0];
   console.log("header", header);
@@ -25,6 +26,7 @@ itemController.createItem = catchAsync(async (req, res, next) => {
     for (let i = 0; i < e.length; i++) {
       obj.author = admin._id;
       obj.spreadsheetId = spreadsheetId;
+      obj.rowIndex = index;
       obj[header[i].toLowerCase()] = parseDynamic(e[i]);
     }
     return obj;
@@ -44,14 +46,40 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
   console.log("sort", sort);
   console.log("order", order);
   const filterCondition = [{ spreadsheetId }];
-  const allowFilter = ["name", "category"];
-  allowFilter.forEach((field) => {
-    if (filter[field] !== undefined) {
-      filterCondition.push({
-        [[field]]: filter[field],
+
+  if (filter) {
+    const withDelimiter = Object.keys(filter)
+      .filter((key) => key.indexOf(DELIMITER) > -1)
+      .map((key) => {
+        const segment = key.split(DELIMITER);
+        const operator = segment[segment.length - 1];
+        segment.pop();
+        const field = segment.join(DELIMITER);
+        return [field, operator, key];
+      });
+    const noDelimiter = Object.keys(filter).filter(
+      (key) => key.indexOf(DELIMITER) === -1
+    );
+
+    if (noDelimiter) {
+      noDelimiter.forEach((item) => {
+        filterCondition.push({
+          [item]: parseDynamic(filter[item]),
+        });
       });
     }
-  });
+    if (withDelimiter) {
+      withDelimiter.forEach(([item1, item2, item3]) => {
+        filterCondition.push({
+          [item1]: {
+            [`$${item2}`]: parseDynamic(filter[item3]),
+          },
+        });
+      });
+    }
+  }
+
+  console.log("filter", filter);
   const filterCriteria = filterCondition.length
     ? { $and: filterCondition }
     : {};
@@ -59,16 +87,16 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
   let sortCondition = { createAt: -1 };
   if (sort) {
     if (order === "asc") {
-      sortCondition = { [sort]: -1 };
-    } else if (order === "dsc") {
       sortCondition = { [sort]: 1 };
+    } else if (order === "dsc") {
+      sortCondition = { [sort]: -1 };
     }
   }
 
   console.log("filter", filterCriteria);
 
   console.log("sort", sortCondition);
-  const count = await db.collection("items").countDocuments(filter);
+  const count = await db.collection("items").countDocuments(filterCriteria);
   const totalPage = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
