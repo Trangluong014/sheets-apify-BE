@@ -45,7 +45,7 @@ router.post(
 // router.get("/all", loginRequired, adminList);
 // 4. Admin can see other admin with same website's information by id
 router.get(
-  "/:id",
+  "profile/:id",
 
   validate([param("id").exists().isString().custom(checkObjectId)]),
   loginRequired,

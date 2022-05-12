@@ -4,6 +4,7 @@ const {
   createItem,
   getAllItem,
   deleteItem,
+  getSingleItem,
 } = require("../controllers/item.controller");
 const { loginRequired } = require("../middlewares/authentication");
 const { isAdmin } = require("../middlewares/authorization");
@@ -14,7 +15,7 @@ router.post("/create/:spreadsheetId", loginRequired, createItem);
 
 router.get("/all/:spreadsheetId", getAllItem);
 
-router.get("/single/:spreadsheetId/:id", getAllItem);
+router.get("/single/:spreadsheetId/:id", getSingleItem);
 
 router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
 module.exports = router;
