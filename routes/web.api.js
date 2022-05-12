@@ -22,7 +22,7 @@ router.post(
 );
 
 router.get("/all", loginRequired, getWebList);
-router.get("/single/websiteId", loginRequired, getSingleWeb);
+router.get("/single/:websiteId", loginRequired, getSingleWeb);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;
