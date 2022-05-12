@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
-const { catchAsync, sendResponse, parseDynamic } = require("../helpers/utils");
+const {
+  catchAsync,
+  sendResponse,
+  parseDynamic,
+  AppError,
+} = require("../helpers/utils");
 // const { db } = require("../models/Web");
 
 const User = require("../models/User");
@@ -117,9 +122,27 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
   );
 });
 
+itemController.getSingleItem = catchAsync(async (req, res, next) => {
+  const { spreadsheetId, id } = req.params;
+
+  const item = await db
+    .collection("items")
+    .findOne({ spreadsheetId }, { _id: id });
+
+  if (!item) {
+    throw new AppError(404, "Item not found");
+  }
+
+  return sendResponse(res, 200, true, { item }, null, "Get Single Item sucess");
+});
+
 itemController.deleteItem = catchAsync(async (req, res, next) => {
   const { spreadsheetId } = req.params;
-  const { currentUserId } = req;
+  const { currentUserId, currentUserRole } = req;
+  if (currentUserRole !== admin) {
+    throw new AppError(403, "Only Admin can delete Item");
+  }
+  const admin = await User.findById(currentUserId);
 
   db.collection("items").deleteMany({ spreadsheetId });
 
