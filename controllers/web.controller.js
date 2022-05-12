@@ -60,57 +60,43 @@ webController.createWeb = catchAsync(async (req, res, next) => {
   );
 });
 
-// webController.getItems = catchAsync(async (req, res, next) => {
-//   let { page, limit, sort, ...filter } = { ...req.query };
-//   page = parseInt(page) || 1;
-//   limit = parseInt(limit) || 10;
-//   const { webId } = req.params;
+webController.getWebList = catchAsync(async (req, res, next) => {
+  let { page, limit } = { ...req.query };
+  page = parseInt(page) || 1;
+  limit = parseInt(limit) || 10;
+  const { currentUserId } = req;
 
-//   const data = await Web.findById(webId).data;
-//   const allowFilter = ["name", "category"];
-//   allowFilter.forEach((field) => {
-//     if (filter[field] !== undefined) {
-//       filterCondition.push({
-//         [field]: { $regex: filter[field], $options: "i" },
-//       });
-//     }
-//   });
-//   const filterCriteria = filterCondition.length
-//     ? { $and: filterCondition }
-//     : {};
+  const count = await Web.countDocuments({ author: currentUserId });
+  const totalPage = Math.ceil(count / limit);
+  const offset = limit * (page - 1);
 
-//   let sortCondition = { createAt: -1 };
-//   if (sort) {
-//     if (sort === "priceasc") {
-//       sortCondition = { ...sortCondition, price: -1 };
-//     } else if (sort === "pricedsc") {
-//       sortCondition = { ...sortCondition, price: 1 };
-//     }
-//   }
+  const webList = await Web.find({ author: currentUserId })
+    .sort({ createAt: -1 })
+    .skip(offset)
+    .limit(limit)
+    .toArray();
 
-//   const sortCriteria = sortCondition.length ? sortCondition : {};
+  return sendResponse(
+    res,
+    200,
+    true,
+    { webList, totalPage },
+    null,
+    "Get Website List Successfully"
+  );
+});
 
-//   console.log("filter", filterCondition);
+webController.getSingleWeb = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
 
-//   console.log("sort", sortCondition);
-//   const count = await Product.countDocuments(filter);
-//   const totalPage = Math.ceil(count / limit);
-//   const offset = limit * (page - 1);
+  const web = await Web.findById(id);
 
-//   const productList = await Product.find(filterCriteria)
-//     .sort(sortCriteria)
-//     .skip(offset)
-//     .limit(limit);
+  if (!web) {
+    throw new AppError(404, "Website not found");
+  }
 
-//   return sendResponse(
-//     res,
-//     200,
-//     true,
-//     { productList, totalPage },
-//     null,
-//     "Get Product Successfully"
-//   );
-// });
+  return sendResponse(res, 200, true, { web }, null, "Get Single Web sucess");
+});
 
 //Update data to Website
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { createWeb } = require("../controllers/web.controller");
+const { createWeb, getWebList } = require("../controllers/web.controller");
 const { loginRequired } = require("../middlewares/authentication");
 const { validate } = require("../middlewares/validator");
 const router = express.Router();
@@ -16,6 +16,8 @@ router.post(
   loginRequired,
   createWeb
 );
+
+router.get("/all", loginRequired, getWebList);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;

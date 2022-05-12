@@ -42,7 +42,7 @@ itemController.createItem = catchAsync(async (req, res, next) => {
 
   db.collection("items").insertMany(data);
 
-  return sendResponse(res, 200, true, {}, null, "Create Items success");
+  return;
 });
 itemController.getAllItem = catchAsync(async (req, res, next) => {
   let { page, limit, sort, order, ...filter } = { ...req.query };
