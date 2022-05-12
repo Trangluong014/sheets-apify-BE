@@ -14,7 +14,7 @@ router.post("/:spreadsheetId/create", loginRequired, createItem);
 
 router.get("/all/:spreadsheetId", getAllItem);
 
-router.get("/:spreadsheetId/single/:id", getAllItem);
+router.get("/single/:spreadsheetId/:id", getAllItem);
 
 router.delete("/:spreadsheetId/delete", loginRequired, deleteItem);
 module.exports = router;
