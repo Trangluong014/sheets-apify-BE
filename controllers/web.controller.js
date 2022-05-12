@@ -10,6 +10,7 @@ const db = mongoose.connection;
 const User = require("../models/User");
 const Web = require("../models/Web");
 const { getSheetLastUpdate, readData } = require("./googleapi.controller");
+const { createItem } = require("./item.controller");
 
 const webController = {};
 
@@ -29,6 +30,7 @@ webController.createWeb = catchAsync(async (req, res, next) => {
       "Website is already generated from this spreadsheet"
     );
   }
+  await createItem(range, currentUserId, spreadsheetId);
   const itemList = await db
     .collection("items")
     .find({ spreadsheetId })
@@ -73,8 +75,7 @@ webController.getWebList = catchAsync(async (req, res, next) => {
   const webList = await Web.find({ author: currentUserId })
     .sort({ createAt: -1 })
     .skip(offset)
-    .limit(limit)
-    .toArray();
+    .limit(limit);
 
   return sendResponse(
     res,
