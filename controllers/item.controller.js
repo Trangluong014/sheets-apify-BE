@@ -37,6 +37,8 @@ itemController.createItem = catchAsync(async (req, res, next) => {
     return obj;
   });
   console.log("data", data);
+  admin.spreadsheetId = spreadsheetId;
+  await admin.save();
 
   db.collection("items").insertMany(data);
 
@@ -67,19 +69,28 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
     );
 
     if (noDelimiter) {
-      noDelimiter.forEach((item) => {
+      noDelimiter.forEach((key) => {
         filterCondition.push({
-          [item]: parseDynamic(filter[item]),
+          [key]: parseDynamic(filter[key]),
         });
       });
     }
     if (withDelimiter) {
-      withDelimiter.forEach(([item1, item2, item3]) => {
-        filterCondition.push({
-          [item1]: {
-            [`$${item2}`]: parseDynamic(filter[item3]),
-          },
-        });
+      withDelimiter.forEach(([field, operator, key]) => {
+        filterCondition.push(
+          operator === "contains"
+            ? {
+                [field]: {
+                  $regex: filter[key],
+                  $options: "i",
+                },
+              }
+            : {
+                [field]: {
+                  [`$${operator}`]: parseDynamic(filter[key]),
+                },
+              }
+        );
       });
     }
   }
