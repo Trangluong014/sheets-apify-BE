@@ -10,11 +10,11 @@ const { isAdmin } = require("../middlewares/authorization");
 const { validate } = require("../middlewares/validator");
 const router = express.Router();
 
-router.post("/:spreadsheetId/create", loginRequired, createItem);
+router.post("/create/:spreadsheetId", loginRequired, createItem);
 
 router.get("/all/:spreadsheetId", getAllItem);
 
 router.get("/single/:spreadsheetId/:id", getAllItem);
 
-router.delete("/:spreadsheetId/delete", loginRequired, deleteItem);
+router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
 module.exports = router;
