@@ -1,6 +1,10 @@
 const express = require("express");
 const { body } = require("express-validator");
-const { createWeb, getWebList } = require("../controllers/web.controller");
+const {
+  createWeb,
+  getWebList,
+  getSingleWeb,
+} = require("../controllers/web.controller");
 const { loginRequired } = require("../middlewares/authentication");
 const { validate } = require("../middlewares/validator");
 const router = express.Router();
@@ -18,6 +22,7 @@ router.post(
 );
 
 router.get("/all", loginRequired, getWebList);
+router.get("/single/websiteId", loginRequired, getSingleWeb);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;
