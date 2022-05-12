@@ -59,38 +59,46 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
       .filter((key) => key.indexOf(DELIMITER) > -1)
       .map((key) => {
         const segment = key.split(DELIMITER);
+        const value = filter[key];
         const operator = segment[segment.length - 1];
         segment.pop();
         const field = segment.join(DELIMITER);
-        return [field, operator, key];
+        return [field, operator, value];
       });
-    const noDelimiter = Object.keys(filter).filter(
-      (key) => key.indexOf(DELIMITER) === -1
-    );
+    const noDelimiter = Object.keys(filter)
+      .filter((key) => key.indexOf(DELIMITER) === -1)
+      .map((key) => {
+        const value = filter[key];
+        return [key, value];
+      });
 
     if (noDelimiter) {
-      noDelimiter.forEach((key) => {
-        filterCondition.push({
-          [key]: parseDynamic(filter[key]),
-        });
+      noDelimiter.forEach(([key, value]) => {
+        if (value) {
+          filterCondition.push({
+            [key]: parseDynamic(value),
+          });
+        }
       });
     }
     if (withDelimiter) {
-      withDelimiter.forEach(([field, operator, key]) => {
-        filterCondition.push(
-          operator === "contains"
-            ? {
-                [field]: {
-                  $regex: filter[key],
-                  $options: "i",
-                },
-              }
-            : {
-                [field]: {
-                  [`$${operator}`]: parseDynamic(filter[key]),
-                },
-              }
-        );
+      withDelimiter.forEach(([field, operator, value]) => {
+        if (value) {
+          filterCondition.push(
+            operator === "contains"
+              ? {
+                  [field]: {
+                    $regex: value,
+                    $options: "i",
+                  },
+                }
+              : {
+                  [field]: {
+                    [`$${operator}`]: parseDynamic(value),
+                  },
+                }
+          );
+        }
       });
     }
   }
