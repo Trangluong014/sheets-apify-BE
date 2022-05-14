@@ -17,12 +17,12 @@ const webController = {};
 
 //Create Website
 webController.createWeb = catchAsync(async (req, res, next) => {
-  const { name, spreadsheeUrl, template, range, _id } = req.body;
+  const { name, spreadsheetUrl, template, range, _id } = req.body;
   const { currentUserId } = req;
 
   let admin = await User.findById(currentUserId);
 
-  const urlSpilt = spreadsheeUrl.split("/");
+  const urlSpilt = spreadsheetUrl.split("/");
   const spreadsheetId = urlSpilt[5];
   let website = await Web.findOne({ spreadsheetId });
   if (website) {
