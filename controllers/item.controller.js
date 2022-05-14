@@ -50,7 +50,7 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
   const { spreadsheetId } = req.params;
 
   if (!range) {
-    const website = Website.findOne({ spreadsheetId });
+    const website = await Website.findOne({ spreadsheetId });
     range = website.ranges[0];
   }
   const filterCondition = [{ spreadsheetId }, { range }];
@@ -203,15 +203,13 @@ itemController.updateItemList = catchAsync(async (req, res, next) => {
       $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
     });
     if (count > data.length) {
-      await db
-        .collection("item")
-        .deleteMany({
-          $and: [
-            { rowIndex: { $gt: count - data.length } },
-            { spreadsheetId: website.spreadsheetId },
-            { range },
-          ],
-        });
+      await db.collection("item").deleteMany({
+        $and: [
+          { rowIndex: { $gt: count - data.length } },
+          { spreadsheetId: website.spreadsheetId },
+          { range },
+        ],
+      });
     }
     if (count < data.length) {
       data = data.slice(count - 1);
