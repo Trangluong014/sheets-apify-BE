@@ -10,7 +10,6 @@ const userSchema = Schema(
     password: { type: String, require: true, select: false },
     isDeleted: { type: Boolean, default: false, select: false },
     webId: { type: String },
-    spreadsheetId: { type: String },
     role: { type: String, enum: ["Admin", "Customer"] },
   },
   { timestamp: true }

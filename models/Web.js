@@ -8,11 +8,18 @@ const webSchema = Schema(
     spreadsheetId: { type: String, require: true },
     range: { type: String, require: true },
     template: { type: String, enum: ["template1", "template2"] },
-    lastUpdate: { type: String, require: true }, //datetime.now, last update of website when save data from database to render
+    lastUpdate: { type: String, require: true },
     data: { type: Array, require: true },
     dbLastUpdate: { type: String, require: true },
   },
   { timestamp: true }
 );
+
+webSchema.methods.toJSON = function () {
+  const obj = this._doc;
+  delete obj.data;
+  return obj;
+};
+
 const Web = mongoose.model("Web", webSchema);
 module.exports = Web;

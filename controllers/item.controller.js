@@ -16,34 +16,32 @@ const DELIMITER = "__";
 const db = mongoose.connection;
 //Create Items
 
-itemController.createItem = catchAsync(async (req, res, next) => {
-  const { range } = req.body;
-  const { currentUserId } = req;
-  const { spreadsheetId } = req.params;
+itemController.createItem = catchAsync(
+  async (range, currentUserId, spreadsheetId) => {
+    let admin = await User.findById(currentUserId);
 
-  let admin = await User.findById(currentUserId);
+    let data = await readData(spreadsheetId, range);
+    let header = data[0];
+    console.log("header", header);
+    data = data.slice(1).map((e, index) => {
+      const obj = {};
+      for (let i = 0; i < e.length; i++) {
+        obj.author = admin._id;
+        obj.spreadsheetId = spreadsheetId;
+        obj.rowIndex = index;
+        obj[header[i].toLowerCase()] = parseDynamic(e[i]);
+      }
+      return obj;
+    });
+    console.log("data", data);
+    admin.spreadsheetId = spreadsheetId;
+    await admin.save();
 
-  let data = await readData(spreadsheetId, range);
-  let header = data[0];
-  console.log("header", header);
-  data = data.slice(1).map((e, index) => {
-    const obj = {};
-    for (let i = 0; i < e.length; i++) {
-      obj.author = admin._id;
-      obj.spreadsheetId = spreadsheetId;
-      obj.rowIndex = index;
-      obj[header[i].toLowerCase()] = parseDynamic(e[i]);
-    }
-    return obj;
-  });
-  console.log("data", data);
-  admin.spreadsheetId = spreadsheetId;
-  await admin.save();
+    db.collection("items").insertMany(data);
 
-  db.collection("items").insertMany(data);
-
-  return;
-});
+    return;
+  }
+);
 itemController.getAllItem = catchAsync(async (req, res, next) => {
   let { page, limit, sort, order, ...filter } = { ...req.query };
   page = parseInt(page) || 1;

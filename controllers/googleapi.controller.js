@@ -60,12 +60,34 @@ googleApiController.readData = async (spreadsheetId, range) => {
   try {
     let response = (await sheets.spreadsheets.values.get(request)).data;
     response = response.values;
-    let itemsList = response.map;
     return response;
   } catch (error) {
     console.log(error);
   }
 };
+
+googleApiController.getListSheet = catchAsync(async (req, res, next) => {
+  const oauth2Client = googleAuth();
+  let tokens = fs.readFileSync("tokens.json", "utf8");
+  tokens = JSON.parse(tokens);
+  oauth2Client.setCredentials(tokens);
+  const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+  const url =
+    "https://docs.google.com/spreadsheets/d/1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY/edit#gid=902358667";
+  const urlSpilt = url.split("/");
+  const spreadsheetId = urlSpilt[5];
+  console.log(spreadsheetId);
+  const request = {
+    spreadsheetId,
+  };
+
+  let response = (await sheets.spreadsheets.get(request)).data;
+  console.log(response);
+  response = response.sheets;
+  const sheetsList = response.map((sheet) => sheet.properties.title);
+  return sendResponse(res, 200, true, sheetsList, null, "List of sheets");
+});
+
 googleApiController.getSheetLastUpdate = async (fileId) => {
   const oauth2Client = googleAuth();
   let tokens = fs.readFileSync("tokens.json", "utf8");

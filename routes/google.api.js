@@ -7,6 +7,7 @@ const {
   getToken,
   readData,
   getSheetLastUpdate,
+  getListSheet,
 } = require("../controllers/googleapi.controller");
 const {
   sendResponse,
@@ -44,5 +45,7 @@ router.get("/:fileId/drive/update", async function (req, res, next) {
   let data = await getSheetLastUpdate(fileId);
   sendResponse(res, 200, true, { data }, null, "success");
 });
+
+router.get("/spreadsheet/sheet", getListSheet);
 
 module.exports = router;
