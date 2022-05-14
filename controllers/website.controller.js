@@ -17,7 +17,7 @@ const websiteController = {};
 
 //Create Website
 websiteController.createWebsite = catchAsync(async (req, res, next) => {
-  const { name, spreadsheetUrl, template, range, websiteId } = req.body;
+  const { name, spreadsheetUrl, template, ranges, websiteId } = req.body;
   const { currentUserId } = req;
 
   let admin = await User.findById(currentUserId);
@@ -45,14 +45,15 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
     author: admin._id,
     name,
     spreadsheetId,
-    range,
+    ranges,
     template,
     lastUpdate,
     dbLastUpdate,
   });
 
-  await createItem(range, currentUserId, spreadsheetId);
-
+  ranges.forEach((range) => await createItem(range, currentUserId, spreadsheetId)
+  )
+  
   return sendResponse(
     res,
     200,

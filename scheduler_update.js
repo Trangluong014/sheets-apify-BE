@@ -28,7 +28,7 @@ mongoose
         console.log("web", website.dbLastUpdate, website.lastUpdate);
 
         if (website.dbLastUpdate > website.lastUpdate) {
-          website.range.forEach( (range ) => {
+          website.ranges.forEach( (range ) => {
             let data = await readData(website.spreadsheetId, range);
             let header = data[0];
             data = data.slice(1);
