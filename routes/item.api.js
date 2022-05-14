@@ -13,9 +13,9 @@ const router = express.Router();
 
 router.post("/create/:spreadsheetId", loginRequired, createItem);
 
-router.get("/all/:spreadsheetId", getAllItem);
+router.get("/:spreadsheetId", getAllItem);
 
-router.get("/single/:spreadsheetId/:id", getSingleItem);
+router.get("/:spreadsheetId/:id", getSingleItem);
 
 router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
 module.exports = router;

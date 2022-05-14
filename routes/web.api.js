@@ -21,7 +21,7 @@ router.post(
   createWeb
 );
 
-router.get("/all", loginRequired, getWebList);
+router.get("/", loginRequired, getWebList);
 router.get("/:websiteId", getSingleWeb);
 
 // const { name, url, template, range } = req.body;
