@@ -14,7 +14,7 @@ router.post(
   validate([
     body("_id", "Invalid _id").exists().notEmpty(),
     body("name", "Invalid name").exists().notEmpty(),
-    body("url", "Invalid url").exists().notEmpty(),
+    body("spreadsheetUrl", "Invalid url").exists().notEmpty(),
     body("template", "Invalid template").exists().notEmpty(),
     body("range", "Invalid range").exists().notEmpty(),
   ]),
