@@ -52,12 +52,6 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   });
 
   await createItem(range, currentUserId, spreadsheetId);
-  const itemList = await db
-    .collection("items")
-    .find({ spreadsheetId })
-    .toArray();
-  website.date = itemList.map((item) => item._id);
-  await website.save();
 
   return sendResponse(
     res,

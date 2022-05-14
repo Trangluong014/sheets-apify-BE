@@ -7,6 +7,7 @@ const {
 } = require("../helpers/utils");
 
 const User = require("../models/User");
+const Website = require("../models/Website");
 const { readData } = require("./googleapi.controller");
 
 const itemController = {};
@@ -27,6 +28,7 @@ itemController.createItem = catchAsync(
       for (let i = 0; i < e.length; i++) {
         obj.author = admin._id;
         obj.spreadsheetId = spreadsheetId;
+        obj.range = range;
         obj.rowIndex = index;
         obj[header[i].toLowerCase()] = parseDynamic(e[i]);
       }
@@ -42,14 +44,16 @@ itemController.createItem = catchAsync(
   }
 );
 itemController.getAllItem = catchAsync(async (req, res, next) => {
-  let { page, limit, sort, order, ...filter } = { ...req.query };
+  let { page, limit, range, sort, order, ...filter } = { ...req.query };
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
   const { spreadsheetId } = req.params;
 
-  console.log("sort", sort);
-  console.log("order", order);
-  const filterCondition = [{ spreadsheetId }];
+  if (!range) {
+    const website = Website.findOne({ spreadsheetId });
+    range = website.range[0];
+  }
+  const filterCondition = [{ spreadsheetId }, { range }];
 
   if (filter) {
     const withDelimiter = Object.keys(filter)
