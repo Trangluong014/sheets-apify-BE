@@ -51,9 +51,12 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
     dbLastUpdate,
   });
 
-  ranges.forEach((range) => await createItem(range, currentUserId, spreadsheetId)
-  )
-  
+  const promises = ranges.map(
+    async (range) => await createItem(range, currentUserId, spreadsheetId)
+  );
+
+  await Promise.all(promises);
+
   return sendResponse(
     res,
     200,

@@ -7,10 +7,9 @@ const websiteSchema = Schema(
     name: { type: String, require: true },
     websiteId: { type: String, require: true },
     spreadsheetId: { type: String, require: true },
-    range: { type: Array, require: true },
+    ranges: { type: Array, require: true },
     template: { type: String, enum: ["template1", "template2"] },
     lastUpdate: { type: String, require: true },
-    data: { type: Array },
     dbLastUpdate: { type: String, require: true },
   },
   { timestamp: true }
