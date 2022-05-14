@@ -156,7 +156,7 @@ itemController.getSingleItem = catchAsync(async (req, res, next) => {
 itemController.deleteItem = catchAsync(async (req, res, next) => {
   const { spreadsheetId } = req.params;
   const { currentUserId, currentUserRole } = req;
-  if (currentUserRole !== admin) {
+  if (currentUserRole !== "Admin") {
     throw new AppError(403, "Only Admin can delete Item");
   }
   const admin = await User.findById(currentUserId);

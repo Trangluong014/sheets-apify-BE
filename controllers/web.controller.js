@@ -17,7 +17,7 @@ const webController = {};
 
 //Create Website
 webController.createWeb = catchAsync(async (req, res, next) => {
-  const { name, spreadsheetUrl, template, range, _id } = req.body;
+  const { name, spreadsheetUrl, template, range, websiteId } = req.body;
   const { currentUserId } = req;
 
   let admin = await User.findById(currentUserId);
@@ -31,8 +31,12 @@ webController.createWeb = catchAsync(async (req, res, next) => {
       "Website is already generated from this spreadsheet"
     );
   }
+  website = await Web.findOne({ websiteId });
+  if (website) {
+    throw new AppError(409, "Website Id must be unique");
+  }
   website = await Web.create({
-    _id: mongoose.Types.ObjectId(_id),
+    websiteId,
     author: admin._id,
     name,
     spreadsheetId,
