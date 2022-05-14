@@ -35,6 +35,11 @@ webController.createWeb = catchAsync(async (req, res, next) => {
   if (website) {
     throw new AppError(409, "Website Id must be unique");
   }
+
+  const lastUpdate = Date.now();
+  let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
+  dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
+
   website = await Web.create({
     websiteId,
     author: admin._id,
@@ -53,10 +58,6 @@ webController.createWeb = catchAsync(async (req, res, next) => {
     .toArray();
   website.date = itemList.map((item) => item._id);
   await website.save();
-
-  const lastUpdate = Date.now();
-  let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
-  dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
   return sendResponse(
     res,
