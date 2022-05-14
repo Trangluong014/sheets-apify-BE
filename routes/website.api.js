@@ -24,7 +24,7 @@ router.post(
 );
 
 router.get("/", loginRequired, getWebsitesList);
-router.get("/:Id", getSingleWebsite);
+router.get("/:websiteId", getSingleWebsite);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;

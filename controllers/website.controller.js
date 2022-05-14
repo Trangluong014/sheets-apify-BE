@@ -96,10 +96,10 @@ websiteController.getWebsitesList = catchAsync(async (req, res, next) => {
 });
 
 websiteController.getSingleWebsite = catchAsync(async (req, res, next) => {
-  const { Id } = req.params;
-  console.log(Id);
+  const { websiteId } = req.params;
+  console.log(websiteId);
 
-  const website = await Website.findById(Id);
+  const website = await Website.findOne({ websiteId });
 
   if (!website) {
     throw new AppError(404, "Website not found");
