@@ -5,7 +5,6 @@ const {
   parseDynamic,
   AppError,
 } = require("../helpers/utils");
-// const { db } = require("../models/Web");
 
 const User = require("../models/User");
 const { readData } = require("./googleapi.controller");

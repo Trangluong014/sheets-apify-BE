@@ -6,17 +6,17 @@ const {
   AppError,
   parseDynamic,
 } = require("../helpers/utils");
-// const { db } = require("../models/Web");
+
 const db = mongoose.connection;
 const User = require("../models/User");
-const Web = require("../models/Web");
+const Website = require("../models/Website");
 const { getSheetLastUpdate, readData } = require("./googleapi.controller");
 const { createItem } = require("./item.controller");
 
 const websiteController = {};
 
 //Create Website
-websiteController.createWeb = catchAsync(async (req, res, next) => {
+websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const { name, spreadsheetUrl, template, range, websiteId } = req.body;
   const { currentUserId } = req;
 
@@ -24,14 +24,14 @@ websiteController.createWeb = catchAsync(async (req, res, next) => {
 
   const urlSpilt = spreadsheetUrl.split("/");
   const spreadsheetId = urlSpilt[5];
-  let website = await Web.findOne({ spreadsheetId });
+  let website = await Website.findOne({ spreadsheetId });
   if (website) {
     throw new AppError(
       409,
       "Website is already generated from this spreadsheet"
     );
   }
-  website = await Web.findOne({ websiteId });
+  website = await Website.findOne({ websiteId });
   if (website) {
     throw new AppError(409, "Website Id must be unique");
   }
@@ -40,7 +40,7 @@ websiteController.createWeb = catchAsync(async (req, res, next) => {
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
   dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
-  website = await Web.create({
+  website = await Website.create({
     websiteId,
     author: admin._id,
     name,
@@ -69,17 +69,17 @@ websiteController.createWeb = catchAsync(async (req, res, next) => {
   );
 });
 
-websiteController.getWebList = catchAsync(async (req, res, next) => {
+websiteController.getWebsitesList = catchAsync(async (req, res, next) => {
   let { page, limit } = { ...req.query };
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
   const { currentUserId } = req;
 
-  const count = await Web.countDocuments({ author: currentUserId });
+  const count = await Website.countDocuments({ author: currentUserId });
   const totalPage = Math.ceil(count / limit);
   const offset = limit * (page - 1);
 
-  const webList = await Web.find({ author: currentUserId })
+  const websiteList = await Website.find({ author: currentUserId })
     .sort({ createAt: -1 })
     .skip(offset)
     .limit(limit)
@@ -89,23 +89,30 @@ websiteController.getWebList = catchAsync(async (req, res, next) => {
     res,
     200,
     true,
-    { webList, totalPage },
+    { websiteList, totalPage },
     null,
     "Get Website List Successfully"
   );
 });
 
-websiteController.getSingleWeb = catchAsync(async (req, res, next) => {
+websiteController.getSingleWebsite = catchAsync(async (req, res, next) => {
   const { websiteId } = req.params;
   console.log(websiteId);
 
-  const web = await Web.findById(websiteId);
+  const website = await Website.findOne({ websiteId });
 
-  if (!web) {
+  if (!website) {
     throw new AppError(404, "Website not found");
   }
 
-  return sendResponse(res, 200, true, { web }, null, "Get Single Web sucess");
+  return sendResponse(
+    res,
+    200,
+    true,
+    { website },
+    null,
+    "Get Single Web sucess"
+  );
 });
 
 //Update data to Website
