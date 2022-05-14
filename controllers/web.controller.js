@@ -31,28 +31,28 @@ webController.createWeb = catchAsync(async (req, res, next) => {
       "Website is already generated from this spreadsheet"
     );
   }
-  await createItem(range, currentUserId, spreadsheetId);
-  const itemList = await db
-    .collection("items")
-    .find({ spreadsheetId })
-    .toArray();
-  data = itemList.map((item) => item._id);
-
-  const lastUpdate = Date.now();
-  let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
-  dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
-
   website = await Web.create({
-    _id,
+    _id: mongoose.Types.ObjectId(_id),
     author: admin._id,
     name,
     spreadsheetId,
     range,
     template,
-    data,
     lastUpdate,
     dbLastUpdate,
   });
+
+  await createItem(range, currentUserId, spreadsheetId);
+  const itemList = await db
+    .collection("items")
+    .find({ spreadsheetId })
+    .toArray();
+  website.date = itemList.map((item) => item._id);
+  await website.save();
+
+  const lastUpdate = Date.now();
+  let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
+  dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
   return sendResponse(
     res,
