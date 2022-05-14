@@ -13,7 +13,7 @@ const router = express.Router();
 router.post(
   "/create",
   validate([
-    body("_id", "Invalid _id").exists().notEmpty(),
+    body("websiteId", "Invalid websiteId").exists().notEmpty(),
     body("name", "Invalid name").exists().notEmpty(),
     body("spreadsheetUrl", "Invalid url").exists().notEmpty(),
     body("template", "Invalid template").exists().notEmpty(),
