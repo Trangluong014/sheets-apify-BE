@@ -17,7 +17,7 @@ router.post(
     body("name", "Invalid name").exists().notEmpty(),
     body("spreadsheetUrl", "Invalid url").exists().notEmpty(),
     body("template", "Invalid template").exists().notEmpty(),
-    body("range", "Invalid range").exists().notEmpty(),
+    body("ranges", "Invalid ranges").exists().notEmpty(),
   ]),
   loginRequired,
   createWebsite
