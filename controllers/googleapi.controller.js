@@ -72,8 +72,8 @@ googleApiController.getListSheet = catchAsync(async (req, res, next) => {
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
-  const url =
-    "https://docs.google.com/spreadsheets/d/1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY/edit#gid=902358667";
+  const url = req.query.spreadsheet_url;
+
   const urlSpilt = url.split("/");
   const spreadsheetId = urlSpilt[5];
   console.log(spreadsheetId);
