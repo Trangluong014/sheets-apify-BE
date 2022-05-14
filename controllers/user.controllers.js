@@ -7,7 +7,7 @@ const userController = {};
 // user can create account with email and password
 
 userController.userRegister = catchAsync(async (req, res, next) => {
-  let { name, email, password, webId, role } = req.body;
+  let { name, email, password, websiteId, role } = req.body;
 
   let user = await User.findOne({ email });
 
@@ -18,7 +18,7 @@ userController.userRegister = catchAsync(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
 
-  user = await User.create({ name, email, password, webId, role });
+  user = await User.create({ name, email, password, websiteId, role });
 
   const accessToken = user.generateToken();
 
@@ -58,7 +58,10 @@ userController.getSingleUserInfoById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { currentUserId } = req;
   const currentUser = await User.findById(currentUserId);
-  const user = await User.findOne({ _id: id, webId: currentUser.webId });
+  const user = await User.findOne({
+    _id: id,
+    websiteId: currentUser.websiteId,
+  });
   if (!user) {
     throw new AppError(
       404,
