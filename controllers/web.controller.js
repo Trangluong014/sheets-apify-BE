@@ -1,3 +1,4 @@
+const { admin } = require("googleapis/build/src/apis/admin");
 const mongoose = require("mongoose");
 const {
   catchAsync,
@@ -75,7 +76,8 @@ webController.getWebList = catchAsync(async (req, res, next) => {
   const webList = await Web.find({ author: currentUserId })
     .sort({ createAt: -1 })
     .skip(offset)
-    .limit(limit);
+    .limit(limit)
+    .populate("author");
 
   return sendResponse(
     res,
