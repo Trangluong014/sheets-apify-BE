@@ -170,9 +170,9 @@ itemController.deleteItem = catchAsync(async (req, res, next) => {
 });
 
 itemController.updateItemList = catchAsync(async (req, res, next) => {
-  const {websiteId} = req.query;
-  const website = await Website.findOne({websiteId})
-  website.ranges.forEach( (range ) => {
+  const { websiteId } = req.query;
+  const website = await Website.findOne({ websiteId });
+  website.ranges.forEach(async (range) => {
     let data = await readData(website.spreadsheetId, range);
     let header = data[0];
     data = data.slice(1);
@@ -188,7 +188,7 @@ itemController.updateItemList = catchAsync(async (req, res, next) => {
       let item = await db.collection("items").findOneAndUpdate(
         {
           $and: [
-            { spreadsheetId: website.spreadsheetId }, 
+            { spreadsheetId: website.spreadsheetId },
             { range },
             { rowIndex: index },
           ],
@@ -199,33 +199,29 @@ itemController.updateItemList = catchAsync(async (req, res, next) => {
       );
     });
     await Promise.all(promises);
-    const count = await db
-      .collection("item")
-      .countDocuments({
-        $and: [
-          { spreadsheetId: website.spreadsheetId },
-          {range}
-        ]
-      });
+    const count = await db.collection("item").countDocuments({
+      $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+    });
     if (count > data.length) {
       await db
         .collection("item")
-        .deleteMany({$and:[
-          { rowIndex: { $gt: count - data.length } },
-          { spreadsheetId: website.spreadsheetId },
-          {range},
-        ]});
+        .deleteMany({
+          $and: [
+            { rowIndex: { $gt: count - data.length } },
+            { spreadsheetId: website.spreadsheetId },
+            { range },
+          ],
+        });
     }
     if (count < data.length) {
       data = data.slice(count - 1);
       await db.collection("items").insertMany(data);
     }
 
- 
-
     website.lastUpdate = Date.now();
     await website.save();
-   return sendResponse(res,200,true,{},null,"Update DB")
-})});
+    return sendResponse(res, 200, true, {}, null, "Update DB");
+  });
+});
 
 module.exports = itemController;
