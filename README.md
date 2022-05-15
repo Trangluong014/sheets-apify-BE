@@ -61,6 +61,7 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
    npm i jsonwebtoken mongoose
    npm i googleapis
    npm install express-validator
+   npm i alphanumeric-encoder
    ```
 
 3. Add dev script
