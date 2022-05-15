@@ -58,6 +58,7 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const promises = website.ranges.map(async (range) => {
     header = await createItem(range, currentUserId, spreadsheetId);
     website.rangeHeaders.push(header);
+    await website.save();
   });
 
   await Promise.all(promises);
@@ -125,6 +126,8 @@ websiteController.deleteWebsite = catchAsync(async (req, res, next) => {
   console.log(websiteId);
 
   const website = await Website.findOneAndDelete({ websiteId });
+  const spreadsheetId = website.spreadsheetId;
+  await db.collection("items").deleteMany({ spreadsheetId });
 
   if (!website) {
     throw new AppError(404, "Website not found");

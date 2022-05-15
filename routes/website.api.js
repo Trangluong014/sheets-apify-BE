@@ -26,7 +26,7 @@ router.post(
 
 router.get("/", loginRequired, getWebsitesList);
 router.get("/:websiteId", getSingleWebsite);
-router.delete("/:websiteId", deleteWebsite);
+router.delete("/:websiteId", loginRequired, deleteWebsite);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;

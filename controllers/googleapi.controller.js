@@ -2,6 +2,8 @@ const { catchAsync, googleAuth, sendResponse } = require("../helpers/utils");
 const fs = require("fs");
 const { google } = require("googleapis");
 const AlphanumericEncoder = require("alphanumeric-encoder");
+const mongoose = require("mongoose");
+const db = mongoose.connection;
 
 const googleApiController = {};
 
@@ -125,12 +127,29 @@ googleApiController.writeToSheet = catchAsync(async (req, res, next) => {
   const column = headers.map((header) => {
     return { header: encoder.decode(rangeHeaders.indexOf(header + 1)) };
   });
-  const data = headers.map((header) => {
+  const data = [];
+
+  const promises = headers.map(async (header, index) => {
     const obj = {};
+
     obj.range = `${range}!${column[header]}${rowIndex}`;
     obj.values = content[header];
-    return obj;
+
+    data[index] = obj;
+    let item = await db.collection("items").findOneAndUpdate(
+      {
+        $and: [
+          { spreadsheetId: website.spreadsheetId },
+          { range },
+          { rowIndex },
+        ],
+      },
+      {
+        $set: obj,
+      }
+    );
   });
+  await Promise.all(promises);
   // const data = [
   //   {
   //     range: "Sheet1!A1", // Update single cell
