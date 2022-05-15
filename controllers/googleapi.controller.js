@@ -138,11 +138,7 @@ googleApiController.writeToSheet = catchAsync(async (req, res, next) => {
     data[index] = obj;
     let item = await db.collection("items").findOneAndUpdate(
       {
-        $and: [
-          { spreadsheetId: website.spreadsheetId },
-          { range },
-          { rowIndex },
-        ],
+        $and: [{ spreadsheetId }, { range }, { rowIndex }],
       },
       {
         $set: obj,

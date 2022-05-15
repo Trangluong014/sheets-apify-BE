@@ -40,7 +40,7 @@ itemController.createItem = catchAsync(
 
     db.collection("items").insertMany(data);
 
-    return { [range]: header };
+    return header;
   }
 );
 itemController.getAllItem = catchAsync(async (req, res, next) => {

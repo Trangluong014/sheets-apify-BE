@@ -56,8 +56,8 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
 
   console.log(website.ranges);
   const promises = website.ranges.map(async (range) => {
-    header = await createItem(range, currentUserId, spreadsheetId);
-    website.rangeHeaders.push(header);
+    const header = await createItem(range, currentUserId, spreadsheetId);
+    website.rangeHeaders = { ...website.rangeHeaders, [range]: header };
     await website.save();
   });
 
