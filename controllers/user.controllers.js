@@ -20,8 +20,6 @@ userController.userRegister = catchAsync(async (req, res, next) => {
 
   user = await User.create({ name, email, password, websiteId, role });
 
-  const accessToken = user.generateToken();
-
   return sendResponse(
     res,
     200,
