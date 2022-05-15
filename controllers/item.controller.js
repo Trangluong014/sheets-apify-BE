@@ -40,7 +40,7 @@ itemController.createItem = catchAsync(
 
     db.collection("items").insertMany(data);
 
-    return;
+    return { [range]: header };
   }
 );
 itemController.getAllItem = catchAsync(async (req, res, next) => {
@@ -174,51 +174,58 @@ itemController.updateItemList = catchAsync(async (req, res, next) => {
   const website = await Website.findOne({ websiteId });
   website.ranges.forEach(async (range) => {
     let data = await readData(website.spreadsheetId, range);
-    let header = data[0];
-    data = data.slice(1);
-    const promises = data.map(async (e, index) => {
-      const obj = {};
-      for (let i = 0; i < e.length; i++) {
+    if (data) {
+      let header = data[0];
+      data = data.slice(1);
+      const promises = data.map(async (e, rowIndex) => {
+        const obj = {};
+        for (let i = 0; i < e.length; i++) {
+          obj[header[i].toLowerCase()] = parseDynamic(e[i]);
+        }
         obj.author = website.author;
         obj.range = range;
+        obj.rowIndex = rowIndex;
         obj.spreadsheetId = website.spreadsheetId;
-        obj[header[i].toLowerCase()] = parseDynamic(e[i]);
-      }
-      data[index] = obj;
-      let item = await db.collection("items").findOneAndUpdate(
-        {
+        data[rowIndex] = obj;
+        let item = await db.collection("items").findOneAndUpdate(
+          {
+            $and: [
+              { spreadsheetId: website.spreadsheetId },
+              { range },
+              { rowIndex },
+            ],
+          },
+          {
+            $set: obj,
+          }
+        );
+      });
+      await Promise.all(promises);
+      const count = await db.collection("items").countDocuments({
+        $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+      });
+      console.log(`data of ${website.name} ${range}`, data);
+      console.log(`${website.name}`, count, data.length);
+      if (count > data.length) {
+        await db.collection("items").deleteMany({
           $and: [
             { spreadsheetId: website.spreadsheetId },
             { range },
-            { rowIndex: index },
+            { rowIndex: { $gt: data.length - 1 } },
           ],
-        },
-        {
-          $set: obj,
-        }
-      );
-    });
-    await Promise.all(promises);
-    const count = await db.collection("item").countDocuments({
-      $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
-    });
-    if (count > data.length) {
-      await db.collection("item").deleteMany({
-        $and: [
-          { rowIndex: { $gt: count - data.length } },
-          { spreadsheetId: website.spreadsheetId },
-          { range },
-        ],
-      });
+        });
+      }
+      if (count < data.length) {
+        data = data.slice(count);
+        await db.collection("items").insertMany(data);
+      }
+      let dbUpdate = await getSheetLastUpdate(website.spreadsheetId);
+      console.log("db", dbUpdate);
+      website.dbLastUpdate = Date.parse(dbUpdate.modifiedTime);
+      website.lastUpdate = Date.now();
+      await website.save();
+      return sendResponse(res, 200, true, {}, null, "Update DB");
     }
-    if (count < data.length) {
-      data = data.slice(count - 1);
-      await db.collection("items").insertMany(data);
-    }
-
-    website.lastUpdate = Date.now();
-    await website.save();
-    return sendResponse(res, 200, true, {}, null, "Update DB");
   });
 });
 

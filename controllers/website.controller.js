@@ -55,9 +55,10 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   });
 
   console.log(website.ranges);
-  const promises = website.ranges.map(
-    async (range) => await createItem(range, currentUserId, spreadsheetId)
-  );
+  const promises = website.ranges.map(async (range) => {
+    header = await createItem(range, currentUserId, spreadsheetId);
+    website.rangeHeaders.push(header);
+  });
 
   await Promise.all(promises);
 
@@ -117,6 +118,19 @@ websiteController.getSingleWebsite = catchAsync(async (req, res, next) => {
     null,
     "Get Single Web sucess"
   );
+});
+
+websiteController.deleteWebsite = catchAsync(async (req, res, next) => {
+  const { websiteId } = req.params;
+  console.log(websiteId);
+
+  const website = await Website.findOneAndDelete({ websiteId });
+
+  if (!website) {
+    throw new AppError(404, "Website not found");
+  }
+
+  return sendResponse(res, 200, true, { website }, null, "Delete Web sucess");
 });
 
 //Update data to Website

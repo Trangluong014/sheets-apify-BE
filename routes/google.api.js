@@ -8,6 +8,7 @@ const {
   readData,
   getSheetLastUpdate,
   getListSheet,
+  writeToSheet,
 } = require("../controllers/googleapi.controller");
 const {
   sendResponse,
@@ -47,5 +48,7 @@ router.get("/:fileId/drive/update", async function (req, res, next) {
 });
 
 router.get("/spreadsheet/sheet", getListSheet);
+
+router.patch("/:spreadsheetId/:range/:rowIndex", writeToSheet);
 
 module.exports = router;

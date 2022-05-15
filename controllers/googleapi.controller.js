@@ -1,6 +1,7 @@
 const { catchAsync, googleAuth, sendResponse } = require("../helpers/utils");
 const fs = require("fs");
 const { google } = require("googleapis");
+const AlphanumericEncoder = require("alphanumeric-encoder");
 
 const googleApiController = {};
 
@@ -108,4 +109,45 @@ googleApiController.getSheetLastUpdate = async (fileId) => {
   }
 };
 
+googleApiController.writeToSheet = catchAsync(async (req, res, next) => {
+  const oauth2Client = googleAuth();
+  let tokens = fs.readFileSync("tokens.json", "utf8");
+  tokens = JSON.parse(tokens);
+  oauth2Client.setCredentials(tokens);
+  const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+  let { range, spreadsheetId, rowIndex } = req.params;
+  const content = req.body;
+  const encoder = new AlphanumericEncoder();
+
+  const website = await Website.findOne({ spreadsheetId });
+  const rangeHeaders = website.rangeHeaders.range;
+  const headers = content.key;
+  const column = headers.map((header) => {
+    return { header: encoder.decode(rangeHeaders.indexOf(header + 1)) };
+  });
+  const data = headers.map((header) => {
+    const obj = {};
+    obj.range = `${range}!${column[header]}${rowIndex}`;
+    obj.values = content[header];
+    return obj;
+  });
+  // const data = [
+  //   {
+  //     range: "Sheet1!A1", // Update single cell
+  //     values: [["A1"]],
+  //   },
+  //   {
+  //     range: "Sheet1!B1:B3", // Update a column
+  //     values: [["B1"], ["B2"], ["B3"]],
+  //   },
+  // ];
+
+  const resource = {
+    data: data,
+    valueInputOption: "USER_ENTERED",
+  };
+  sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
+
+  sendResponse(res, 200, true, {}, null, "Write to sheet done");
+});
 module.exports = googleApiController;

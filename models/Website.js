@@ -8,6 +8,7 @@ const websiteSchema = Schema(
     websiteId: { type: String, require: true },
     spreadsheetId: { type: String, require: true },
     ranges: { type: Array, require: true },
+    rangeHeaders: { type: Array },
     template: { type: String, enum: ["template1", "template2"] },
     lastUpdate: { type: String, require: true },
     dbLastUpdate: { type: String, require: true },

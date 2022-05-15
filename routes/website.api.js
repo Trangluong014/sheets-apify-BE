@@ -4,6 +4,7 @@ const {
   createWebsite,
   getWebsitesList,
   getSingleWebsite,
+  deleteWebsite,
 } = require("../controllers/website.controller");
 
 const { loginRequired } = require("../middlewares/authentication");
@@ -25,6 +26,7 @@ router.post(
 
 router.get("/", loginRequired, getWebsitesList);
 router.get("/:websiteId", getSingleWebsite);
+router.delete("/:websiteId", deleteWebsite);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;

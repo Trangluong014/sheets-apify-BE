@@ -33,22 +33,22 @@ mongoose
             if (data) {
               let header = data[0];
               data = data.slice(1);
-              const promises = data.map(async (e, index) => {
+              const promises = data.map(async (e, rowIndex) => {
                 const obj = {};
                 for (let i = 0; i < e.length; i++) {
-                  obj.author = website.author;
-                  obj.range = range;
-                  obj.rowIndex = index;
-                  obj.spreadsheetId = website.spreadsheetId;
                   obj[header[i].toLowerCase()] = parseDynamic(e[i]);
                 }
-                data[index] = obj;
+                obj.author = website.author;
+                obj.range = range;
+                obj.rowIndex = rowIndex;
+                obj.spreadsheetId = website.spreadsheetId;
+                data[rowIndex] = obj;
                 let item = await db.collection("items").findOneAndUpdate(
                   {
                     $and: [
                       { spreadsheetId: website.spreadsheetId },
                       { range },
-                      { rowIndex: index },
+                      { rowIndex },
                     ],
                   },
                   {
@@ -67,15 +67,14 @@ mongoose
                   $and: [
                     { spreadsheetId: website.spreadsheetId },
                     { range },
-                    { rowIndex: { $gt: data.length } },
+                    { rowIndex: { $gt: data.length - 1 } },
                   ],
                 });
               }
               if (count < data.length) {
-                data = data.slice(count - 1);
+                data = data.slice(count);
                 await db.collection("items").insertMany(data);
               }
-
               website.lastUpdate = Date.now();
               await website.save();
               console.log(`update DB ${website.name}`);
