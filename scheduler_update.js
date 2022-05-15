@@ -31,7 +31,6 @@ mongoose
           website.ranges.forEach(async (range) => {
             let data = await readData(website.spreadsheetId, range);
             if (data) {
-              console.log(`data of ${website.name} ${range}`, data);
               let header = data[0];
               data = data.slice(1);
               const promises = data.map(async (e, index) => {
@@ -39,6 +38,7 @@ mongoose
                 for (let i = 0; i < e.length; i++) {
                   obj.author = website.author;
                   obj.range = range;
+                  obj.rowIndex = index;
                   obj.spreadsheetId = website.spreadsheetId;
                   obj[header[i].toLowerCase()] = parseDynamic(e[i]);
                 }
@@ -57,16 +57,17 @@ mongoose
                 );
               });
               await Promise.all(promises);
-              const count = await db.collection("item").countDocuments({
+              const count = await db.collection("items").countDocuments({
                 $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
               });
-              console.log(count, data.length);
+              console.log(`data of ${website.name} ${range}`, data);
+              console.log(`${website.name}`, count, data.length);
               if (count > data.length) {
-                await db.collection("item").deleteMany({
+                await db.collection("items").deleteMany({
                   $and: [
-                    { rowIndex: { $gt: count - data.length } },
                     { spreadsheetId: website.spreadsheetId },
                     { range },
+                    { rowIndex: { $gt: data.length } },
                   ],
                 });
               }
