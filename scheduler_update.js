@@ -31,8 +31,7 @@ mongoose
           website.ranges.forEach(async (range) => {
             let data = await readData(website.spreadsheetId, range);
             if (data) {
-              let headers = data[0];
-              headers.map((header) => header.toLowerCase());
+              let headers = data[0].map((header) => header.toLowerCase());
               data = data.slice(1);
               const promises = data.map(async (e, rowIndex) => {
                 const obj = {};
@@ -76,13 +75,13 @@ mongoose
                 data = data.slice(count);
                 await db.collection("items").insertMany(data);
               }
-              website.lastUpdate = Date.now();
-              await website.save();
-              console.log(`update DB ${website.name}`);
             }
           });
+          website.lastUpdate = Date.now();
+          await website.save();
+          console.log(`update DB ${website.name}`);
         } else {
-          console.log("dont need update");
+          console.log(`dont need update ${website.name}`);
         }
       });
     });
