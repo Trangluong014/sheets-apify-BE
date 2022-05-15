@@ -20,14 +20,7 @@ userController.userRegister = catchAsync(async (req, res, next) => {
 
   user = await User.create({ name, email, password, websiteId, role });
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { user, accessToken },
-    null,
-    "User register done"
-  );
+  return sendResponse(res, 200, true, { user }, null, "User register done");
 });
 
 // user can login with email and password
