@@ -28,7 +28,7 @@ userController.userRegister = catchAsync(async (req, res, next) => {
     true,
     { user, accessToken },
     null,
-    "User register success"
+    "User register done"
   );
 });
 
@@ -49,7 +49,7 @@ userController.userLogin = catchAsync(async (req, res, next) => {
 
   const accessToken = user.generateToken();
 
-  return sendResponse(res, 200, true, { user, accessToken }, null, "success");
+  return sendResponse(res, 200, true, { user, accessToken }, null, "done");
 });
 
 // User can see other User with same website's information by id
@@ -76,7 +76,7 @@ userController.getSingleUserInfoById = catchAsync(async (req, res, next) => {
     true,
     { user },
     null,
-    "Get single User information success"
+    "Get single User information done"
   );
 });
 
@@ -95,7 +95,7 @@ userController.getUserOwnInfo = catchAsync(async (req, res, next) => {
     true,
     { user },
     null,
-    "Get user own information success"
+    "Get user own information done"
   );
 });
 
@@ -120,7 +120,7 @@ userController.updateUserAccount = catchAsync(async (req, res, next) => {
     true,
     { user },
     null,
-    "Update user Information success"
+    "Update user Information done"
   );
 });
 
@@ -153,7 +153,7 @@ userController.updateUserPassword = catchAsync(async (req, res, next) => {
     true,
     { user },
     null,
-    "update user password success"
+    "update user password done"
   );
 });
 
@@ -169,18 +169,11 @@ userController.deactivateUserAccount = catchAsync(async (req, res, next) => {
     throw new AppError(404, "User Not Found", "Deactive user Account error");
   }
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    {},
-    null,
-    "deactivate user account success"
-  );
+  return sendResponse(res, 200, true, {}, null, "deactivate user account done");
 });
 // User can see list of their own websites.
 userController.register = catchAsync(async (req, res, next) => {
-  return sendResponse(res, 200, true, {}, null, "success");
+  return sendResponse(res, 200, true, {}, null, "done");
 });
 
 module.exports = userController;

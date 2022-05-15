@@ -1,8 +1,14 @@
-const { catchAsync, googleAuth, sendResponse } = require("../helpers/utils");
+const {
+  catchAsync,
+  googleAuth,
+  sendResponse,
+  parseDynamic,
+} = require("../helpers/utils");
 const fs = require("fs");
 const { google } = require("googleapis");
 const AlphanumericEncoder = require("alphanumeric-encoder");
 const mongoose = require("mongoose");
+const Website = require("../models/Website");
 const db = mongoose.connection;
 
 const googleApiController = {};
@@ -43,7 +49,7 @@ googleApiController.getToken = catchAsync(async function (req, res, next) {
     });
   }
 
-  return sendResponse(res, 200, true, {}, null, "success");
+  return sendResponse(res, 200, true, {}, null, "done");
 });
 
 googleApiController.readData = async (spreadsheetId, range) => {
@@ -111,41 +117,53 @@ googleApiController.getSheetLastUpdate = async (fileId) => {
   }
 };
 
-googleApiController.writeToSheet = catchAsync(async (req, res, next) => {
+googleApiController.updateCurrentRow = catchAsync(async (req, res, next) => {
   const oauth2Client = googleAuth();
   let tokens = fs.readFileSync("tokens.json", "utf8");
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
   let { range, spreadsheetId, rowIndex } = req.params;
-  const content = req.body;
+  console.log(range, spreadsheetId, rowIndex);
+  let content = req.body;
+
+  content = Object.fromEntries(
+    Object.entries(content).map(([k, v]) => [k.toLowerCase(), parseDynamic(v)])
+  );
+  console.log("content", content);
   const encoder = new AlphanumericEncoder();
 
   const website = await Website.findOne({ spreadsheetId });
-  const rangeHeaders = website.rangeHeaders.range;
-  const headers = content.key;
-  const column = headers.map((header) => {
-    return { header: encoder.decode(rangeHeaders.indexOf(header + 1)) };
+  const rangeHeaders = website.rangeHeaders[range];
+  console.log("headerdb", rangeHeaders);
+  const headers = Object.keys(content);
+  console.log("header", headers);
+
+  const data = headers.map((header) => {
+    return {
+      range: `${range}!${encoder.encode(rangeHeaders.indexOf(header) + 1)}${
+        parseDynamic(rowIndex) + 2
+      }`,
+      values: [[String(content[header])]],
+    };
   });
-  const data = [];
+  console.log("data", data);
 
-  const promises = headers.map(async (header, index) => {
-    const obj = {};
+  const item = await db.collection("items").findOneAndUpdate(
+    {
+      $and: [
+        { spreadsheetId },
+        { range },
+        { rowIndex: parseDynamic(rowIndex) },
+      ],
+    },
+    {
+      $set: content,
+    }
+  );
 
-    obj.range = `${range}!${column[header]}${rowIndex}`;
-    obj.values = content[header];
+  console.log("item", item);
 
-    data[index] = obj;
-    let item = await db.collection("items").findOneAndUpdate(
-      {
-        $and: [{ spreadsheetId }, { range }, { rowIndex }],
-      },
-      {
-        $set: obj,
-      }
-    );
-  });
-  await Promise.all(promises);
   // const data = [
   //   {
   //     range: "Sheet1!A1", // Update single cell
@@ -163,6 +181,72 @@ googleApiController.writeToSheet = catchAsync(async (req, res, next) => {
   };
   sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
 
-  sendResponse(res, 200, true, {}, null, "Write to sheet done");
+  sendResponse(res, 200, true, {}, null, "Update current row done");
+});
+
+googleApiController.addNewRow = catchAsync(async (req, res, next) => {
+  const oauth2Client = googleAuth();
+  let tokens = fs.readFileSync("tokens.json", "utf8");
+  tokens = JSON.parse(tokens);
+  oauth2Client.setCredentials(tokens);
+  const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+  let { range, spreadsheetId } = req.params;
+  console.log(range, spreadsheetId);
+  let content = req.body;
+
+  content = Object.fromEntries(
+    Object.entries(content).map(([k, v]) => [k.toLowerCase(), parseDynamic(v)])
+  );
+  console.log("content", content);
+  const encoder = new AlphanumericEncoder();
+
+  const rowIndex = await db
+    .collection("items")
+    .countDocuments({ $and: [{ spreadsheetId }, { range }] });
+  console.log("row", rowIndex);
+  const website = await Website.findOne({ spreadsheetId });
+  const rangeHeaders = website.rangeHeaders[range];
+  console.log("headerdb", rangeHeaders);
+  const headers = Object.keys(content);
+  console.log("header", headers);
+
+  const data = headers.map((header) => {
+    return {
+      range: `${range}!${encoder.encode(rangeHeaders.indexOf(header) + 1)}${
+        parseDynamic(rowIndex) + 2
+      }`,
+      values: [[String(content[header])]],
+    };
+  });
+  console.log("data", data);
+
+  const item = await db.collection("items").insertOne({
+    author: website.author,
+    spreadsheetId,
+    range,
+    rowIndex,
+    ...content,
+  });
+
+  console.log("item", item);
+
+  // const data = [
+  //   {
+  //     range: "Sheet1!A1", // Update single cell
+  //     values: [["A1"]],
+  //   },
+  //   {
+  //     range: "Sheet1!B1:B3", // Update a column
+  //     values: [["B1"], ["B2"], ["B3"]],
+  //   },
+  // ];
+
+  const resource = {
+    data: data,
+    valueInputOption: "USER_ENTERED",
+  };
+  sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
+
+  sendResponse(res, 200, true, {}, null, "Add new column done");
 });
 module.exports = googleApiController;

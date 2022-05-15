@@ -21,8 +21,8 @@ itemController.createItem = catchAsync(
     let admin = await User.findById(currentUserId);
 
     let data = await readData(spreadsheetId, range);
-    let header = data[0];
-    console.log("header", header);
+    let headers = data[0].map((header) => header.toLowerCase());
+    console.log("header", headers);
     data = data.slice(1).map((e, index) => {
       const obj = {};
       for (let i = 0; i < e.length; i++) {
@@ -30,7 +30,7 @@ itemController.createItem = catchAsync(
         obj.spreadsheetId = spreadsheetId;
         obj.range = range;
         obj.rowIndex = index;
-        obj[header[i].toLowerCase()] = parseDynamic(e[i]);
+        obj[headers[i]] = parseDynamic(e[i]);
       }
       return obj;
     });
@@ -40,7 +40,7 @@ itemController.createItem = catchAsync(
 
     db.collection("items").insertMany(data);
 
-    return header;
+    return headers;
   }
 );
 itemController.getAllItem = catchAsync(async (req, res, next) => {
@@ -138,7 +138,7 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
     true,
     { itemList, totalPage },
     null,
-    "Get Item Successfully"
+    "Get Item donefully"
   );
 });
 
@@ -153,7 +153,7 @@ itemController.getSingleItem = catchAsync(async (req, res, next) => {
     throw new AppError(404, "Item not found");
   }
 
-  return sendResponse(res, 200, true, { item }, null, "Get Single Item sucess");
+  return sendResponse(res, 200, true, { item }, null, "Get Single Item done");
 });
 
 itemController.deleteItem = catchAsync(async (req, res, next) => {
@@ -166,7 +166,7 @@ itemController.deleteItem = catchAsync(async (req, res, next) => {
 
   db.collection("items").deleteMany({ spreadsheetId });
 
-  return sendResponse(res, 200, true, {}, null, "Delete Items success");
+  return sendResponse(res, 200, true, {}, null, "Delete Items done");
 });
 
 itemController.updateItemList = catchAsync(async (req, res, next) => {

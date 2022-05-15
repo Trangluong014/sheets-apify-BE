@@ -65,14 +65,7 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
 
   session.endSession();
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { website },
-    null,
-    "Create Website success"
-  );
+  return sendResponse(res, 200, true, { website }, null, "Create Website done");
 });
 
 websiteController.getWebsitesList = catchAsync(async (req, res, next) => {
@@ -97,7 +90,7 @@ websiteController.getWebsitesList = catchAsync(async (req, res, next) => {
     true,
     { websiteList, totalPage },
     null,
-    "Get Website List Successfully"
+    "Get Website List done"
   );
 });
 

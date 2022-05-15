@@ -1,5 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
+const db = mongoose.connection;
 const deepEqual = require("deep-equal");
 
 const {
@@ -11,7 +12,6 @@ const { parseDynamic } = require("./helpers/utils");
 const Website = require("./models/Website");
 
 const mongoURI = process.env.MONGO_DEV_URI;
-const db = mongoose.connection;
 
 // const mongoURI = process.env.MONGO_DEV_URI;
 
@@ -31,12 +31,13 @@ mongoose
           website.ranges.forEach(async (range) => {
             let data = await readData(website.spreadsheetId, range);
             if (data) {
-              let header = data[0];
+              let headers = data[0];
+              headers.map((header) => header.toLowerCase());
               data = data.slice(1);
               const promises = data.map(async (e, rowIndex) => {
                 const obj = {};
                 for (let i = 0; i < e.length; i++) {
-                  obj[header[i].toLowerCase()] = parseDynamic(e[i]);
+                  obj[headers[i]] = parseDynamic(e[i]);
                 }
                 obj.author = website.author;
                 obj.range = range;

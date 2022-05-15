@@ -9,6 +9,9 @@ const {
   getSheetLastUpdate,
   getListSheet,
   writeToSheet,
+  updateCurrentRow,
+  addNewRole,
+  addNewRow,
 } = require("../controllers/googleapi.controller");
 const {
   sendResponse,
@@ -16,6 +19,7 @@ const {
   catchAsync,
   parseDynamic,
 } = require("../helpers/utils");
+const { loginRequired } = require("../middlewares/authentication");
 
 router.get("/redirect", makeRedirect);
 
@@ -49,6 +53,12 @@ router.get("/:fileId/drive/update", async function (req, res, next) {
 
 router.get("/spreadsheet/sheet", getListSheet);
 
-router.patch("/:spreadsheetId/:range/:rowIndex", writeToSheet);
+router.patch(
+  "/:spreadsheetId/:range/:rowIndex",
+  loginRequired,
+  updateCurrentRow
+);
+
+router.post("/:spreadsheetId/:range", loginRequired, addNewRow);
 
 module.exports = router;
