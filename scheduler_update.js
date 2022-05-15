@@ -28,7 +28,7 @@ mongoose
         console.log("web", website.dbLastUpdate, website.lastUpdate);
 
         if (website.dbLastUpdate > website.lastUpdate) {
-          website.ranges.forEach(async (range) => {
+          const promise1 = website.ranges.map(async (range) => {
             let data = await readData(website.spreadsheetId, range);
             if (data) {
               let headers = data[0].map((header) => header.toLowerCase());
@@ -77,6 +77,7 @@ mongoose
               }
             }
           });
+          await Promise.all(promise1);
           website.lastUpdate = Date.now();
           await website.save();
           console.log(`update DB ${website.name}`);

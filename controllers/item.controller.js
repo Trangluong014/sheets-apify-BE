@@ -172,15 +172,16 @@ itemController.deleteItem = catchAsync(async (req, res, next) => {
 itemController.updateItemList = catchAsync(async (req, res, next) => {
   const { websiteId } = req.query;
   const website = await Website.findOne({ websiteId });
-  website.ranges.forEach(async (range) => {
+
+  const promise1 = website.ranges.map(async (range) => {
     let data = await readData(website.spreadsheetId, range);
     if (data) {
-      let header = data[0];
+      let headers = data[0].map((header) => header.toLowerCase());
       data = data.slice(1);
       const promises = data.map(async (e, rowIndex) => {
         const obj = {};
         for (let i = 0; i < e.length; i++) {
-          obj[header[i].toLowerCase()] = parseDynamic(e[i]);
+          obj[headers[i]] = parseDynamic(e[i]);
         }
         obj.author = website.author;
         obj.range = range;
@@ -219,14 +220,16 @@ itemController.updateItemList = catchAsync(async (req, res, next) => {
         data = data.slice(count);
         await db.collection("items").insertMany(data);
       }
-      let dbUpdate = await getSheetLastUpdate(website.spreadsheetId);
-      console.log("db", dbUpdate);
-      website.dbLastUpdate = Date.parse(dbUpdate.modifiedTime);
-      website.lastUpdate = Date.now();
-      await website.save();
-      return sendResponse(res, 200, true, {}, null, "Update DB");
     }
   });
+  await Promise.all(promise1);
+  let dbUpdate = await getSheetLastUpdate(website.spreadsheetId);
+  console.log("db", dbUpdate);
+  website.dbLastUpdate = Date.parse(dbUpdate.modifiedTime);
+  website.lastUpdate = Date.now();
+  await website.save();
+
+  return sendResponse(res, 200, true, {}, null, `update DB ${website.name}`);
 });
 
 module.exports = itemController;
