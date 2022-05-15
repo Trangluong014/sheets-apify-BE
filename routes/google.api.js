@@ -53,12 +53,8 @@ router.get("/:fileId/drive/update", async function (req, res, next) {
 
 router.get("/spreadsheet/sheet", getListSheet);
 
-router.patch(
-  "/:spreadsheetId/:range/:rowIndex",
-  loginRequired,
-  updateCurrentRow
-);
+router.patch("/:spreadsheetId/:range/:rowIndex", updateCurrentRow);
 
-router.post("/:spreadsheetId/:range", loginRequired, addNewRow);
+router.post("/:spreadsheetId/:range", addNewRow);
 
 module.exports = router;
