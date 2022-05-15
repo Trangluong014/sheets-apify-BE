@@ -5,6 +5,7 @@ const {
   getAllItem,
   deleteItem,
   getSingleItem,
+  updateItemList,
 } = require("../controllers/item.controller");
 const { loginRequired } = require("../middlewares/authentication");
 const { isAdmin } = require("../middlewares/authorization");
@@ -18,4 +19,6 @@ router.get("/:spreadsheetId", getAllItem);
 router.get("/:spreadsheetId/:id", getSingleItem);
 
 router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
+
+router.put("/update/:spreadsheetId", loginRequired, updateItemList);
 module.exports = router;

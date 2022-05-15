@@ -1,3 +1,4 @@
+const { defaultConfiguration } = require("express/lib/application");
 const { admin } = require("googleapis/build/src/apis/admin");
 const mongoose = require("mongoose");
 const {
@@ -40,6 +41,8 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   let dbLastUpdate = await getSheetLastUpdate(spreadsheetId);
   dbLastUpdate = Date.parse(dbLastUpdate.modifiedTime);
 
+  const session = await mongoose.startSession();
+  db.startSession();
   website = await Website.create({
     websiteId,
     author: admin._id,
@@ -51,11 +54,14 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
     dbLastUpdate,
   });
 
-  const promises = ranges.map(
+  console.log(website.ranges);
+  const promises = website.ranges.map(
     async (range) => await createItem(range, currentUserId, spreadsheetId)
   );
 
   await Promise.all(promises);
+
+  session.endSession();
 
   return sendResponse(
     res,
