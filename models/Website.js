@@ -17,11 +17,5 @@ const websiteSchema = Schema(
   { timestamp: true }
 );
 
-websiteSchema.methods.toJSON = function () {
-  const obj = this._doc;
-  delete obj.data;
-  return obj;
-};
-
 const Website = mongoose.model("Website", websiteSchema);
 module.exports = Website;
