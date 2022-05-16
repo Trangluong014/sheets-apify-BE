@@ -18,7 +18,8 @@ const websiteController = {};
 
 //Create Website
 websiteController.createWebsite = catchAsync(async (req, res, next) => {
-  const { name, spreadsheetUrl, template, ranges, websiteId } = req.body;
+  const { name, spreadsheetUrl, template, ranges, websiteId, config } =
+    req.body;
   const { currentUserId } = req;
 
   let admin = await User.findById(currentUserId);
@@ -44,6 +45,7 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   const session = await mongoose.startSession();
   db.startSession();
   website = await Website.create({
+    config,
     websiteId,
     author: admin._id,
     name,
@@ -104,14 +106,32 @@ websiteController.getSingleWebsite = catchAsync(async (req, res, next) => {
     throw new AppError(404, "Website not found");
   }
 
-  return sendResponse(
-    res,
-    200,
-    true,
-    { website },
-    null,
-    "Get Single Web sucess"
-  );
+  return sendResponse(res, 200, true, { website }, null, "Get Single Web done");
+});
+
+websiteController.updateWebsite = catchAsync(async (req, res, next) => {
+  const { currentUserId } = req;
+  const { websiteId } = req.params;
+
+  let admin = await User.findById(currentUserId);
+
+  if (!admin) {
+    throw new AppError(404, "User Not Found", "Update Website Error");
+  }
+  const website = await Website.findOneAndDelete({ websiteId });
+  if (!website) {
+    throw new AppError(404, "Website not found");
+  }
+
+  const allows = ["name", "ranges", "config"];
+  allows.forEach((field) => {
+    if (req.body[field]) {
+      website[field] = req.body[field];
+    }
+  });
+  await website.save();
+
+  return sendResponse(res, 200, true, { website }, null, "Update Website done");
 });
 
 websiteController.deleteWebsite = catchAsync(async (req, res, next) => {
@@ -126,7 +146,7 @@ websiteController.deleteWebsite = catchAsync(async (req, res, next) => {
     throw new AppError(404, "Website not found");
   }
 
-  return sendResponse(res, 200, true, { website }, null, "Delete Web sucess");
+  return sendResponse(res, 200, true, { website }, null, "Delete Web done");
 });
 
 //Update data to Website

@@ -12,6 +12,7 @@ const websiteSchema = Schema(
     template: { type: String, enum: ["template1", "template2"] },
     lastUpdate: { type: String, require: true },
     dbLastUpdate: { type: String, require: true },
+    config: { type: Schema.Types.Mixed },
   },
   { timestamp: true }
 );
