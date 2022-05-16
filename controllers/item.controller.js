@@ -147,7 +147,7 @@ itemController.getSingleItem = catchAsync(async (req, res, next) => {
 
   const item = await db
     .collection("items")
-    .findOne({ spreadsheetId }, { _id: id });
+    .findOne({ $and: [{ spreadsheetId }, { _id: id }] });
 
   if (!item) {
     throw new AppError(404, "Item not found");
