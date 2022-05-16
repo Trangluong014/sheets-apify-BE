@@ -5,6 +5,7 @@ const {
   parseDynamic,
   AppError,
 } = require("../helpers/utils");
+const ObjectId = require("mongodb").ObjectId;
 
 const User = require("../models/User");
 const Website = require("../models/Website");
@@ -143,11 +144,11 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
 });
 
 itemController.getSingleItem = catchAsync(async (req, res, next) => {
-  const { spreadsheetId, id } = req.params;
+  const { spreadsheetId, rowIndex, range } = req.params;
 
-  const item = await db
-    .collection("items")
-    .findOne({ $and: [{ spreadsheetId }, { _id: id }] });
+  const item = await db.collection("items").findOne({
+    $and: [{ spreadsheetId }, { range }, { rowIndex: parseDynamic(rowIndex) }],
+  });
 
   if (!item) {
     throw new AppError(404, "Item not found");
