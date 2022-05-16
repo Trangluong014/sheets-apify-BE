@@ -138,7 +138,7 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
     true,
     { itemList, totalPage },
     null,
-    "Get Item donefully"
+    "Get Item done"
   );
 });
 
