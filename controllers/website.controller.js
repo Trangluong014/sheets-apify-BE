@@ -121,7 +121,7 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   if (!admin) {
     throw new AppError(404, "User Not Found", "Update Website Error");
   }
-  const website = await Website.findOneAndDelete({ websiteId });
+  const website = await Website.findOne({ websiteId });
   if (!website) {
     throw new AppError(404, "Website not found");
   }
