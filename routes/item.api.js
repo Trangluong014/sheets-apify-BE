@@ -20,5 +20,4 @@ router.get("/:spreadsheetId/:id", getSingleItem);
 
 router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
 
-router.put("/update/:spreadsheetId", loginRequired, updateItemList);
 module.exports = router;

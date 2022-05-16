@@ -29,6 +29,7 @@ router.get("/", loginRequired, getWebsitesList);
 router.get("/:websiteId", getSingleWebsite);
 router.delete("/:websiteId", deleteWebsite);
 router.patch("/:websiteId", updateWebsite);
+router.post("/:websiteId/update", loginRequired, updateItemList);
 
 // const { name, url, template, range } = req.body;
 module.exports = router;
