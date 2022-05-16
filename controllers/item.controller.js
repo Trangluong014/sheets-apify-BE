@@ -8,7 +8,7 @@ const {
 
 const User = require("../models/User");
 const Website = require("../models/Website");
-const { readData } = require("./googleapi.controller");
+const { readData, getSheetLastUpdate } = require("./googleapi.controller");
 
 const itemController = {};
 const DELIMITER = "__";
@@ -170,8 +170,16 @@ itemController.deleteItem = catchAsync(async (req, res, next) => {
 });
 
 itemController.updateItemList = catchAsync(async (req, res, next) => {
-  const { websiteId } = req.query;
+  const { websiteId } = req.params;
+  console.log(websiteId);
   const website = await Website.findOne({ websiteId });
+  if (!website) {
+    throw new AppError(
+      404,
+      "Website not found",
+      "Update Website From Sheets Error"
+    );
+  }
 
   const promise1 = website.ranges.map(async (range) => {
     let data = await readData(website.spreadsheetId, range);
