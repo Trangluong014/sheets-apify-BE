@@ -81,11 +81,14 @@ googleApiController.getListSheet = catchAsync(async (req, res, next) => {
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
-  const url = req.query.spreadsheet_url;
+  let { spreadsheet_url, spreadsheet_id } = req.query;
 
-  const urlSpilt = url.split("/");
-  const spreadsheetId = urlSpilt[5];
-  console.log(spreadsheetId);
+  if (!spreadsheet_id) {
+    const urlSpilt = spreadsheet_url.split("/");
+    spreadsheet_id = urlSpilt[5];
+  }
+
+  const spreadsheetId = spreadsheet_id;
   const request = {
     spreadsheetId,
   };
