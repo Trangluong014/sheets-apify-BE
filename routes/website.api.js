@@ -1,5 +1,6 @@
 const express = require("express");
 const { body } = require("express-validator");
+const { updateItemList } = require("../controllers/item.controller");
 const {
   createWebsite,
   getWebsitesList,
@@ -27,8 +28,8 @@ router.post(
 
 router.get("/", loginRequired, getWebsitesList);
 router.get("/:websiteId", getSingleWebsite);
-router.delete("/:websiteId", deleteWebsite);
-router.patch("/:websiteId", updateWebsite);
+router.delete("/:websiteId", loginRequired, deleteWebsite);
+router.patch("/:websiteId", loginRequired, updateWebsite);
 router.post("/:websiteId/update", loginRequired, updateItemList);
 
 // const { name, url, template, range } = req.body;
