@@ -130,7 +130,8 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   const allows = ["name", "ranges", "config"];
   allows.forEach(async (field) => {
     if (req.body[field]) {
-      if (req.body[field] === ranges) {
+      if (req.body.ranges) {
+        const { ranges } = req.body;
         ///add new ranges
         let addRanges = ranges.filter((x) => !website.ranges.includes(x));
 
@@ -152,11 +153,9 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
         let subRanges = website.ranges.filter((x) => !ranges.includes(x));
         if (subRanges) {
           const promises = subRanges.forEach(async (range) => {
-            await db
-              .collection("item")
-              .deleteMany({
-                $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
-              });
+            await db.collection("item").deleteMany({
+              $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+            });
             delete website.rangeHeaders.range;
           });
           await Promise.all(promises);
