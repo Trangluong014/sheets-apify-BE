@@ -128,31 +128,41 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   }
   console.log("body", req.body);
   const allows = ["name", "ranges", "config"];
-  allows.forEach((field) => {
+  allows.forEach(async (field) => {
     if (req.body[field]) {
       if (req.body[field] === ranges) {
         ///add new ranges
-        let addRanges = ranges.filter(x => !website.ranges.includes(x));
-        
-        if(addRanges){const promises = addRanges.map(async (range) => {
-          const header = await createItem(range, currentUserId, spreadsheetId);
-      
-          let rangeHeaders = { [range]: header };
-          website.rangeHeaders= {...website.rangeHeaders,rangeHeaders}
-        });
-      
-        await Promise.all(promises);}
+        let addRanges = ranges.filter((x) => !website.ranges.includes(x));
 
-        let subRanges = website.ranges.filter(x => !ranges.includes(x));
-        if(subRanges){
-          const promises = subRanges.forEach(async(range) =>{
-            await db.collection("item").deleteMany({$and:[{spreadsheetId: website.spreadsheetId}, {range}]})
-          delete website.rangeHeaders.range
-          })
-          await Promise.all(promises);}
+        if (addRanges) {
+          const promises = addRanges.map(async (range) => {
+            const header = await createItem(
+              range,
+              currentUserId,
+              spreadsheetId
+            );
+
+            let rangeHeaders = { [range]: header };
+            website.rangeHeaders = { ...website.rangeHeaders, rangeHeaders };
+          });
+
+          await Promise.all(promises);
         }
 
-      
+        let subRanges = website.ranges.filter((x) => !ranges.includes(x));
+        if (subRanges) {
+          const promises = subRanges.forEach(async (range) => {
+            await db
+              .collection("item")
+              .deleteMany({
+                $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+              });
+            delete website.rangeHeaders.range;
+          });
+          await Promise.all(promises);
+        }
+      }
+
       website[field] = req.body[field];
     }
   });
