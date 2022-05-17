@@ -136,7 +136,7 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
         let addRanges = ranges.filter((x) => !website.ranges.includes(x));
 
         if (addRanges) {
-          const promises = addRanges.map(async (range) => {
+          const promise1 = addRanges.map(async (range) => {
             const header = await createItem(
               range,
               currentUserId,
@@ -147,18 +147,18 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
             website.rangeHeaders = { ...website.rangeHeaders, rangeHeaders };
           });
 
-          await Promise.all(promises);
+          await Promise.all(promise1);
         }
 
         let subRanges = website.ranges.filter((x) => !ranges.includes(x));
         if (subRanges) {
-          const promises = subRanges.forEach(async (range) => {
+          const promise2 = subRanges.forEach(async (range) => {
             await db.collection("item").deleteMany({
               $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
             });
             delete website.rangeHeaders.range;
           });
-          await Promise.all(promises);
+          await Promise.all(promise2);
         }
       }
 
