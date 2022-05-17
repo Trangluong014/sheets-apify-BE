@@ -125,14 +125,14 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   if (!website) {
     throw new AppError(404, "Website not found");
   }
-
+  console.log("body", req.body);
   const allows = ["name", "ranges", "config"];
   allows.forEach((field) => {
     if (req.body[field]) {
       website[field] = req.body[field];
     }
   });
-  if (req.body.range) {
+  if (req.body.ranges) {
     let rangeHeaders = {};
     const promises = website.ranges.map(async (range) => {
       const header = await createItem(
@@ -143,7 +143,7 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
 
       rangeHeaders = { ...rangeHeaders, [range]: header };
     });
-
+    console.log("header", rangeHeaders);
     await Promise.all(promises);
     website.rangeHeaders = rangeHeaders;
   }
