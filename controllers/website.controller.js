@@ -12,7 +12,8 @@ const db = mongoose.connection;
 const User = require("../models/User");
 const Website = require("../models/Website");
 const { getSheetLastUpdate, readData } = require("./googleapi.controller");
-const { createItem } = require("./item.controller");
+const itemController = require("./item.controller");
+const { createItem, updateItemList } = require("./item.controller");
 
 const websiteController = {};
 
@@ -129,23 +130,33 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   const allows = ["name", "ranges", "config"];
   allows.forEach((field) => {
     if (req.body[field]) {
+      if (req.body[field] === ranges) {
+        ///add new ranges
+        let addRanges = ranges.filter(x => !website.ranges.includes(x));
+        
+        if(addRanges){const promises = addRanges.map(async (range) => {
+          const header = await createItem(range, currentUserId, spreadsheetId);
+      
+          let rangeHeaders = { [range]: header };
+          website.rangeHeaders= {...website.rangeHeaders,rangeHeaders}
+        });
+      
+        await Promise.all(promises);}
+
+        let subRanges = website.ranges.filter(x => !ranges.includes(x));
+        if(subRanges){
+          const promises = subRanges.forEach(range =>{
+            await db.collection("item").deleteMany({$and:[{spreadsheetId: website.spreadsheetId}, {range}]})
+          delete website.rangeHeaders.range
+          })
+          await Promise.all(promises);}
+        }
+
+      
       website[field] = req.body[field];
     }
   });
-  if (req.body.ranges) {
-    let rangeHeaders = {};
-    const promises = website.ranges.map(async (range) => {
-      const header = await createItem(
-        range,
-        currentUserId,
-        website.spreadsheetId
-      );
 
-      rangeHeaders = { ...rangeHeaders, [range]: header };
-    });
-    await Promise.all(promises);
-    website.rangeHeaders = rangeHeaders;
-  }
   await website.save();
 
   return sendResponse(res, 200, true, { website }, null, "Update Website done");
