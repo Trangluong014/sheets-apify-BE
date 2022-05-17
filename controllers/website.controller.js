@@ -130,37 +130,37 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   const allows = ["name", "ranges", "config"];
   allows.forEach(async (field) => {
     if (req.body[field]) {
-      if (req.body.ranges) {
-        const { ranges } = req.body;
-        ///add new ranges
-        let addRanges = ranges.filter((x) => !website.ranges.includes(x));
+      // if (req.body.ranges) {
+      //   const { ranges } = req.body;
+      //   ///add new ranges
+      //   let addRanges = ranges.filter((x) => !website.ranges.includes(x));
 
-        if (addRanges) {
-          const promise1 = addRanges.map(async (range) => {
-            const header = await createItem(
-              range,
-              currentUserId,
-              spreadsheetId
-            );
+      //   if (addRanges) {
+      //     const promise1 = addRanges.map(async (range) => {
+      //       const header = await createItem(
+      //         range,
+      //         currentUserId,
+      //         spreadsheetId
+      //       );
 
-            let rangeHeaders = { [range]: header };
-            website.rangeHeaders = { ...website.rangeHeaders, rangeHeaders };
-          });
+      //       let rangeHeaders = { [range]: header };
+      //       website.rangeHeaders = { ...website.rangeHeaders, rangeHeaders };
+      //     });
 
-          await Promise.all(promise1);
-        }
+      //     await Promise.all(promise1);
+      //   }
 
-        let subRanges = website.ranges.filter((x) => !ranges.includes(x));
-        if (subRanges) {
-          const promise2 = subRanges.forEach(async (range) => {
-            await db.collection("item").deleteMany({
-              $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
-            });
-            delete website.rangeHeaders.range;
-          });
-          await Promise.all(promise2);
-        }
-      }
+      //   let subRanges = website.ranges.filter((x) => !ranges.includes(x));
+      //   if (subRanges) {
+      //     const promise2 = subRanges.forEach(async (range) => {
+      //       await db.collection("item").deleteMany({
+      //         $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+      //       });
+      //       delete website.rangeHeaders.range;
+      //     });
+      //     await Promise.all(promise2);
+      //   }
+      // }
 
       website[field] = req.body[field];
     }
