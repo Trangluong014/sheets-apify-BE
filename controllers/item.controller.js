@@ -22,24 +22,26 @@ itemController.createItem = catchAsync(
     let admin = await User.findById(currentUserId);
 
     let data = await readData(spreadsheetId, range);
+    console.log("length", data.length);
     let headers = data[0].map((header) => header.toLowerCase());
     console.log("header", headers);
-    data = data.slice(1).map((e, index) => {
-      const obj = {};
-      for (let i = 0; i < e.length; i++) {
-        obj.author = admin._id;
-        obj.spreadsheetId = spreadsheetId;
-        obj.range = range;
-        obj.rowIndex = index;
-        obj[headers[i]] = parseDynamic(e[i]);
-      }
-      return obj;
-    });
-    console.log("data", data);
-    admin.spreadsheetId = spreadsheetId;
-    await admin.save();
+    if (data.length > 1) {
+      data = data.slice(1).map((e, index) => {
+        const obj = {};
+        for (let i = 0; i < e.length; i++) {
+          obj.author = admin._id;
+          obj.spreadsheetId = spreadsheetId;
+          obj.range = range;
+          obj.rowIndex = index;
+          obj[headers[i]] = parseDynamic(e[i]);
+        }
+        return obj;
+      });
+      admin.spreadsheetId = spreadsheetId;
+      await admin.save();
 
-    db.collection("items").insertMany(data);
+      db.collection("items").insertMany(data);
+    }
 
     return headers;
   }

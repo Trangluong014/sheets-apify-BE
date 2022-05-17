@@ -143,7 +143,6 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
 
       rangeHeaders = { ...rangeHeaders, [range]: header };
     });
-    console.log("header", rangeHeaders);
     await Promise.all(promises);
     website.rangeHeaders = rangeHeaders;
   }
