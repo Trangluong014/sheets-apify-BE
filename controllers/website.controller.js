@@ -132,6 +132,21 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
       website[field] = req.body[field];
     }
   });
+  if (req.body.range) {
+    let rangeHeaders = {};
+    const promises = website.ranges.map(async (range) => {
+      const header = await createItem(
+        range,
+        currentUserId,
+        website.spreadsheetId
+      );
+
+      rangeHeaders = { ...rangeHeaders, [range]: header };
+    });
+
+    await Promise.all(promises);
+    website.rangeHeaders = rangeHeaders;
+  }
   await website.save();
 
   return sendResponse(res, 200, true, { website }, null, "Update Website done");
