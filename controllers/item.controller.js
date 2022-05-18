@@ -48,6 +48,7 @@ itemController.createItem = catchAsync(
 );
 itemController.getAllItem = catchAsync(async (req, res, next) => {
   let { page, limit, range, sort, order, ...filter } = { ...req.query };
+  console.log(sort, order);
   page = parseInt(page) || 1;
   limit = parseInt(limit) || 10;
   const { spreadsheetId } = req.params;
@@ -116,7 +117,7 @@ itemController.getAllItem = catchAsync(async (req, res, next) => {
   if (sort) {
     if (order === "asc") {
       sortCondition = { [sort]: 1 };
-    } else if (order === "dsc") {
+    } else if (order === "desc") {
       sortCondition = { [sort]: -1 };
     }
   }
