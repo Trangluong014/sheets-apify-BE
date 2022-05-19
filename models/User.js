@@ -9,8 +9,11 @@ const userSchema = Schema(
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true, select: false },
     isDeleted: { type: Boolean, default: false, select: false },
-    webId: { type: String },
+    webId: { type: Array },
     role: { type: String, enum: ["Admin", "Customer"] },
+    avatar: { type: String },
+    job: { type: String },
+    company: { type: String },
   },
   { timestamp: true }
 );

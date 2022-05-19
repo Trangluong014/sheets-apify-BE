@@ -68,6 +68,8 @@ websiteController.createWebsite = catchAsync(async (req, res, next) => {
   await Promise.all(promises);
   website.rangeHeaders = rangeHeaders;
   await website.save();
+  admin.webId.push(websiteId);
+  await admin.save();
 
   session.endSession();
 
@@ -174,10 +176,15 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
 websiteController.deleteWebsite = catchAsync(async (req, res, next) => {
   const { websiteId } = req.params;
   console.log(websiteId);
+  const { currentUserId } = req;
+
+  const admin = await User.findById(currentUserId);
 
   const website = await Website.findOneAndDelete({ websiteId });
   const spreadsheetId = website.spreadsheetId;
   await db.collection("items").deleteMany({ spreadsheetId });
+  admin.webId = admin.webId.filter((e) => e !== websiteId);
+  await admin.save();
 
   if (!website) {
     throw new AppError(404, "Website not found");

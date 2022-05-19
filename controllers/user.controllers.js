@@ -98,7 +98,7 @@ userController.updateUserAccount = catchAsync(async (req, res, next) => {
   if (!user) {
     throw new AppError(404, "User Not Found", "Get user own information error");
   }
-  const allows = ["name"];
+  const allows = ["name", "job", "company", "avatar"];
   allows.forEach((field) => {
     if (req.body[field]) {
       user[field] = req.body[field];
