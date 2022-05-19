@@ -11,7 +11,7 @@ const userSchema = Schema(
     isDeleted: { type: Boolean, default: false, select: false },
     webId: { type: Array },
     role: { type: String, enum: ["Admin", "Customer"] },
-    avatar: { type: String },
+    avatar: { type: Schema.Types.Mixed },
     job: { type: String },
     company: { type: String },
   },
