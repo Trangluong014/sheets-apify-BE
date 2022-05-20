@@ -39,9 +39,9 @@ router.get(
   getUserOwnInfo
 );
 // 4. Owner can update own account profile
-router.put("/profile/update", loginRequired, updateUserAccount);
+router.put("/profile", loginRequired, updateUserAccount);
 // 5. Owner can deactivate own account
-router.delete("/profile/deactivate", loginRequired, deactivateUserAccount);
+router.delete("/deactivate", loginRequired, deactivateUserAccount);
 // 6. Owner update password
-router.put("/profile/password", loginRequired, updateUserPassword);
+router.put("/password", loginRequired, updateUserPassword);
 module.exports = router;
