@@ -53,16 +53,16 @@ router.get(
 );
 // 5. Admin can see own user's information
 router.get(
-  "/me/profile",
+  "/profile",
   // validate([header("Authorization").exists().isString()]),
   loginRequired,
   getUserOwnInfo
 );
 // 6. Owner can update own account profile
-router.put("/me/profile/update", loginRequired, updateUserAccount);
+router.put("/profile", loginRequired, updateUserAccount);
 // 7. Owner can deactivate own account
-router.delete("/me/deactivate", loginRequired, deactivateUserAccount);
+router.delete("/deactivate", loginRequired, deactivateUserAccount);
 // 8. Owner can update password
-router.put("/me/profile/password", loginRequired, updateUserPassword);
+router.put("/password", loginRequired, updateUserPassword);
 
 module.exports = router;
