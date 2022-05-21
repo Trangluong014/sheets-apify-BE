@@ -3,6 +3,7 @@ const {
   googleAuth,
   sendResponse,
   parseDynamic,
+  AppError,
 } = require("../helpers/utils");
 const fs = require("fs");
 const { google } = require("googleapis");
@@ -142,14 +143,16 @@ googleApiController.updateCurrentRow = catchAsync(async (req, res, next) => {
   const headers = Object.keys(content);
   console.log("header", headers);
 
-  const data = headers.map((header) => {
-    return {
-      range: `${range}!${encoder.encode(rangeHeaders.indexOf(header) + 1)}${
-        parseDynamic(rowIndex) + 2
-      }`,
-      values: [[String(content[header])]],
-    };
-  });
+  const data = headers
+    .map((header) => {
+      colIndex = encoder.encode(rangeHeaders.indexOf(header) + 1);
+      if (!colIndex) return false;
+      return {
+        range: `${range}!${colIndex}${parseDynamic(rowIndex) + 2}`,
+        values: [[String(content[header])]],
+      };
+    })
+    .filter(Boolean);
   console.log("data", data);
 
   const item = await db.collection("items").findOneAndUpdate(
@@ -167,24 +170,20 @@ googleApiController.updateCurrentRow = catchAsync(async (req, res, next) => {
 
   console.log("item", item);
 
-  // const data = [
-  //   {
-  //     range: "Sheet1!A1", // Update single cell
-  //     values: [["A1"]],
-  //   },
-  //   {
-  //     range: "Sheet1!B1:B3", // Update a column
-  //     values: [["B1"], ["B2"], ["B3"]],
-  //   },
-  // ];
-
   const resource = {
     data: data,
     valueInputOption: "USER_ENTERED",
   };
-  sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
-
-  sendResponse(res, 200, true, {}, null, "Update current row done");
+  if (data && data.length) {
+    sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
+    sendResponse(res, 200, true, {}, null, "Update current row done");
+  } else {
+    throw new AppError(
+      404,
+      "Request data is not sufficient",
+      "Update current row error"
+    );
+  }
 });
 
 googleApiController.addNewRow = catchAsync(async (req, res, next) => {
@@ -213,14 +212,16 @@ googleApiController.addNewRow = catchAsync(async (req, res, next) => {
   const headers = Object.keys(content);
   console.log("header", headers);
 
-  const data = headers.map((header) => {
-    return {
-      range: `${range}!${encoder.encode(rangeHeaders.indexOf(header) + 1)}${
-        parseDynamic(rowIndex) + 2
-      }`,
-      values: [[String(content[header])]],
-    };
-  });
+  const data = headers
+    .map((header) => {
+      const colIndex = encoder.encode(rangeHeaders.indexOf(header) + 1);
+      if (!colIndex) return false;
+      return {
+        range: `${range}!${colIndex}${parseDynamic(rowIndex) + 2}`,
+        values: [[String(content[header])]],
+      };
+    })
+    .filter(Boolean);
   console.log("data", data);
 
   const item = await db.collection("items").insertOne({
@@ -248,8 +249,16 @@ googleApiController.addNewRow = catchAsync(async (req, res, next) => {
     data: data,
     valueInputOption: "USER_ENTERED",
   };
-  sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
 
-  sendResponse(res, 200, true, {}, null, "Add new column done");
+  if (data && data.length) {
+    sheets.spreadsheets.values.batchUpdate({ spreadsheetId, resource });
+    sendResponse(res, 200, true, {}, null, "Add new column done");
+  } else {
+    throw new AppError(
+      400,
+      "Request data is not sufficient",
+      "Update new row error"
+    );
+  }
 });
 module.exports = googleApiController;
