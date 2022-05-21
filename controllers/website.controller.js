@@ -128,16 +128,19 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
   if (!website) {
     throw new AppError(404, "Website not found");
   }
+  const { spreadsheetId } = website;
   console.log("body", req.body);
   const allows = ["name", "ranges", "config"];
-  allows.forEach(async (field) => {
+  const promises = allows.map(async (field) => {
     if (req.body[field]) {
       if (req.body.ranges) {
         const { ranges } = req.body;
+        console.log(ranges);
         ///add new ranges
         let addRanges = ranges.filter((x) => !website.ranges.includes(x));
 
         if (addRanges) {
+          console.log("new range", addRanges);
           const promise1 = addRanges.map(async (range) => {
             const header = await createItem(
               range,
@@ -145,29 +148,38 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
               spreadsheetId
             );
 
-            let rangeHeaders = { [range]: header };
-            website.rangeHeaders = { ...website.rangeHeaders, rangeHeaders };
+            website.rangeHeaders = { ...website.rangeHeaders, [range]: header };
+            console.log(website.rangeHeaders);
           });
 
           await Promise.all(promise1);
         }
 
         let subRanges = website.ranges.filter((x) => !ranges.includes(x));
+
         if (subRanges) {
+          console.log("old range", subRanges);
           const promise2 = subRanges.map(async (range) => {
-            await db.collection("item").deleteMany({
+            console.log(range);
+            console.log({
               $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
             });
-            delete website.rangeHeaders.range;
+            await db.collection("items").deleteMany({
+              $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
+            });
+            console.log(website.rangeHeaders[range]);
+            delete website.rangeHeaders[range];
           });
           await Promise.all(promise2);
         }
       }
 
       website[field] = req.body[field];
+      console.log(website);
     }
   });
-
+  await Promise.all(promises);
+  console.log("here");
   await website.save();
 
   return sendResponse(res, 200, true, { website }, null, "Update Website done");
