@@ -154,7 +154,7 @@ websiteController.updateWebsite = catchAsync(async (req, res, next) => {
 
         let subRanges = website.ranges.filter((x) => !ranges.includes(x));
         if (subRanges) {
-          const promise2 = subRanges.forEach(async (range) => {
+          const promise2 = subRanges.map(async (range) => {
             await db.collection("item").deleteMany({
               $and: [{ spreadsheetId: website.spreadsheetId }, { range }],
             });
