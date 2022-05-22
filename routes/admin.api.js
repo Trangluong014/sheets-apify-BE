@@ -20,7 +20,7 @@ const { isAdmin } = require("../middlewares/authorization");
  * @method: POST
  * @access: Public
  * @description: Create new user document in User collection
- * @constructor: req.body {Adminschema}
+ * @constructor: req.body {Userschema}
  */
 
 router.post(
@@ -38,7 +38,7 @@ router.post(
  * @method: POST
  * @access: Public
  * @description: Login with user email and password
- * @constructor: req.body {Adminschema}
+ * @constructor: req.body {Userschema}
  */
 router.post(
   "/login",

@@ -73,7 +73,7 @@ router.delete("/:websiteId", loginRequired, deleteWebsite);
  */
 router.patch("/:websiteId", loginRequired, updateWebsite);
 
-// 2. Owner can update own Website data
+// 6. Owner can update own Website data
 
 /**
  * @method: patch

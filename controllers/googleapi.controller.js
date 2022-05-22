@@ -10,6 +10,7 @@ const { google } = require("googleapis");
 const AlphanumericEncoder = require("alphanumeric-encoder");
 const mongoose = require("mongoose");
 const Website = require("../models/Website");
+const Google = require("../models/Google");
 const db = mongoose.connection;
 
 const googleApiController = {};
@@ -44,10 +45,14 @@ googleApiController.getToken = catchAsync(async function (req, res, next) {
     let { tokens } = await oauth2Client.getToken(code);
     console.log("token", tokens);
     oauth2Client.setCredentials(tokens);
-    fs.writeFile("tokens.json", JSON.stringify(tokens), (err) => {
-      if (err) return console.error(err);
-      console.log("Token stored to", "tokens.json");
-    });
+    await Google.findByIdAndUpdate(
+      "628a3b21912612f607f89eef",
+      { token: JSON.stringify(tokens) },
+      (err) => {
+        if (err) return console.error(err);
+        console.log("Token stored to", "tokens.json");
+      }
+    );
   }
 
   return sendResponse(res, 200, true, {}, null, "done");
@@ -55,7 +60,7 @@ googleApiController.getToken = catchAsync(async function (req, res, next) {
 
 googleApiController.readData = async (spreadsheetId, range) => {
   const oauth2Client = googleAuth();
-  let tokens = fs.readFileSync("tokens.json", "utf8");
+  let tokens = await Google.findById("628a3b21912612f607f89eef");
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
@@ -78,7 +83,7 @@ googleApiController.readData = async (spreadsheetId, range) => {
 
 googleApiController.getListSheet = catchAsync(async (req, res, next) => {
   const oauth2Client = googleAuth();
-  let tokens = fs.readFileSync("tokens.json", "utf8");
+  let tokens = await Google.findById("628a3b21912612f607f89eef").token;
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
@@ -103,7 +108,7 @@ googleApiController.getListSheet = catchAsync(async (req, res, next) => {
 
 googleApiController.getSheetLastUpdate = async (fileId) => {
   const oauth2Client = googleAuth();
-  let tokens = fs.readFileSync("tokens.json", "utf8");
+  let tokens = await Google.findById("628a3b21912612f607f89eef").token;
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const drive = google.drive({ version: "v3", auth: oauth2Client });
@@ -123,7 +128,7 @@ googleApiController.getSheetLastUpdate = async (fileId) => {
 
 googleApiController.updateCurrentRow = catchAsync(async (req, res, next) => {
   const oauth2Client = googleAuth();
-  let tokens = fs.readFileSync("tokens.json", "utf8");
+  let tokens = await Google.findById("628a3b21912612f607f89eef").token;
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
@@ -188,7 +193,7 @@ googleApiController.updateCurrentRow = catchAsync(async (req, res, next) => {
 
 googleApiController.addNewRow = catchAsync(async (req, res, next) => {
   const oauth2Client = googleAuth();
-  let tokens = fs.readFileSync("tokens.json", "utf8");
+  let tokens = await Google.findById("628a3b21912612f607f89eef").token;
   tokens = JSON.parse(tokens);
   oauth2Client.setCredentials(tokens);
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
