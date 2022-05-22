@@ -12,6 +12,8 @@ const mongoose = require("mongoose");
 const Website = require("../models/Website");
 const Google = require("../models/Google");
 const db = mongoose.connection;
+const client_id = process.env.CLIENT_ID;
+const project_id = process.env.PROJECT_ID;
 
 const googleApiController = {};
 
@@ -45,7 +47,7 @@ googleApiController.getToken = catchAsync(async function (req, res, next) {
     let { tokens } = await oauth2Client.getToken(code);
     console.log("token", tokens);
     oauth2Client.setCredentials(tokens);
-    await Google.create({ tokens });
+    await Google.findOneAndUpdate({ tokens });
   }
 
   return sendResponse(res, 200, true, {}, null, "done");

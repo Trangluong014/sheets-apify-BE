@@ -1,6 +1,13 @@
 const fs = require("fs");
 const { google } = require("googleapis");
 const { sheets } = require("googleapis/build/src/apis/sheets");
+const client_id = process.env.CLIENT_ID;
+const project_id = process.env.PROJECT_ID;
+const auth_uri = process.env.AUTH_URI;
+const token_uri = process.env.TOKEN_URI;
+const auth_provider_x509_cert_url = process.env.AUTH_PROVIDER_X509_CERT_URL;
+const client_secret = process.env.CLIENT_SECRET;
+const redirect_uris = process.env.REDIRECT_URI;
 
 const utilsHelper = {};
 
@@ -33,10 +40,6 @@ utilsHelper.catchAsync = (func) => (req, res, next) =>
 //   };
 // }
 utilsHelper.googleAuth = () => {
-  let credentials = fs.readFileSync("client_secret.json", "utf8");
-  credentials = JSON.parse(credentials);
-  console.log(credentials);
-  const { client_id, client_secret, redirect_uris } = credentials.web;
   const oauth2Client = new google.auth.OAuth2(
     client_id,
     client_secret,
