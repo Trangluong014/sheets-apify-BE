@@ -2,7 +2,7 @@
 
 ## Description
 
-An website applicate that allow people to generate webisite from google sheets. This is build with MERN stack. This is the codebase for the MongoDB NodeJS and Express RESTful backend API.
+An applicate that allow people to generate website from google sheets. This is build with MERN stack. This is the codebase for the MongoDB NodeJS and Express RESTful backend API.
 
 This is the graduation project for the full-stack web dev course @CoderSchoolVn
 
