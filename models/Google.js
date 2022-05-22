@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const googleSchema = Schema(
   {
-    token: { type: Schema.Types.Mixed },
+    tokens: { type: Schema.Types.Mixed },
   },
   { timestamp: true }
 );
