@@ -8,40 +8,55 @@ This is the graduation project for the full-stack web dev course @CoderSchoolVn
 
 ## Features
 
-### CRUD with admin user
-
-1. Admin can create account with email and password
-2. Admin can login with email and password
-3. Admin can see a list of all admins in own website
-4. Admin can see other admin with same website's information by id
-5. Admin can see own user's information
-6. Owner can update own account profile
-7. Owner can deactivate own account
-8. Owner can update password
-
-### CRUD with website user
+### CRUD with admin user / website user
 
 1. User can create account with email and password
+
 2. User can login with email and password
-3. Owner can see own user's information
+
+3. User can see own user's information
+
 4. Owner can update own account profile
+
 5. Owner can deactivate own account
-6. Owner update password
+
+6. Owner can update password
 
 ### CRUD with website
 
-1. Create website
-2. Get data to render website
-3. Update website
-4. Delete website
-5. Get comment/update vote from fe and save to be
-6. Admin can see list of their own websites.
+1.  Create Website and Items belong to the website
+
+2.  Get List of Websites with information of each website
+
+3.  Get single website with information
+
+4.  Owner can delete own Website and all data belong to this website.
+
+5.  Owner can update own Website information
+
+6.  Owner can update own Website data
+
+#### Working with Google Sheet API and Google Drive API
+
+1.  Redirect Google Account O2Auth Login and
+    get accesstoken to Google Drive and Google Spreadsheet
+
+2.  Get List of Sheets in a spreadsheet:
+
+3.  Receive data from front-end and update current row in spreadsheet as well as update in Mongodb Database
+
+4.  Receive data from front-end and add new row to spreadsheet as well as add to Mongodb database
+
+#### website items
+
+1. Get all Items of a website with sort, search, filter, pagination
+2. Get single Item of a website
 
 ## Production API
 
-- [Doc]
+- [Doc](https://app.swaggerhub.com/apis/sheets-apify/sheets-apify/1.0.0-oas3)
 
-- [App demo]
+- [App demo](https://sheetsapify-dashboard.netlify.app/)
 
 ## Project setup
 

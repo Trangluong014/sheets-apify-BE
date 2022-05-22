@@ -12,12 +12,26 @@ const { isAdmin } = require("../middlewares/authorization");
 const { validate } = require("../middlewares/validator");
 const router = express.Router();
 
-router.post("/create/:spreadsheetId", loginRequired, createItem);
+// 1. Get all Items of a website with sort, search, filter, pagination
+
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get all Items of a Website
+ * @constructor: req.params
+ */
 
 router.get("/:spreadsheetId", getAllItem);
 
-router.get("/:spreadsheetId/:range/:rowIndex", getSingleItem);
+// 2. Get single Item of a website
 
-router.delete("/delete/:spreadsheetId", loginRequired, deleteItem);
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get single Items of a Website
+ * @constructor: req.params
+ */
+
+router.get("/:spreadsheetId/:range/:rowIndex", getSingleItem);
 
 module.exports = router;

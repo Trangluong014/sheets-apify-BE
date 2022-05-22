@@ -21,10 +21,26 @@ const {
 } = require("../helpers/utils");
 const { loginRequired } = require("../middlewares/authentication");
 
+// 1. Redirect Google Account O2Auth Login and
+// get accesstoken to Google Drive and Google Spreadsheet
+
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get and save accesstoken to Google Drive and Google Spreadsheet
+ */
+
 router.get("/redirect", makeRedirect);
 
 router.get("/O2Auth", getToken);
 
+// 2. Get Spreadsheet Data  (just to test, not use in product)
+
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get spreadsheet data
+ */
 router.get("/spreadsheet/data", async function (req, res, next) {
   const url =
     "https://docs.google.com/spreadsheets/d/1aaXWw92AySf_PDvTWp9WT65vVCWZYuK5ipT250lHIbY/edit#gid=0";
@@ -44,6 +60,13 @@ router.get("/spreadsheet/data", async function (req, res, next) {
   sendResponse(res, 200, true, { data }, null, "get data success");
 });
 
+// 3. Get Spreadsheet Last Update Information  (just to test, not use in product)
+
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get spreadsheet last update information
+ */
 router.get("/:fileId/drive/update", async function (req, res, next) {
   const { fileId } = req.params;
   console.log(fileId);
@@ -51,9 +74,34 @@ router.get("/:fileId/drive/update", async function (req, res, next) {
   sendResponse(res, 200, true, { data }, null, "success");
 });
 
+// 4. Get List of Sheets in a spreadsheet:
+
+/**
+ * @method: Get
+ * @access: Public
+ * @description: Get list of sheets in a spreadsheet
+ */
 router.get("/spreadsheet/sheet", getListSheet);
 
+// 5. Receive data from front-end and update current row in spreadsheet as well as update in Mongodb Database
+
+/**
+ * @method: Post
+ * @access: Public
+ * @description: Update current row in spreadsheet
+ * @constructor: req.params
+ */
+
 router.patch("/:spreadsheetId/:range/:rowIndex", updateCurrentRow);
+
+// 6. Receive data from front-end and add new row to spreadsheet as well as add to Mongodb Database
+
+/**
+ * @method: Post
+ * @access: Public
+ * @description: Add new row to spreadsheet
+ * @constructor: req.params
+ */
 
 router.post("/:spreadsheetId/:range", addNewRow);
 

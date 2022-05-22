@@ -33,6 +33,13 @@ router.post(
   userRegister
 );
 // 2. Admin can login with email and password
+
+/**
+ * @method: POST
+ * @access: Public
+ * @description: Login with user email and password
+ * @constructor: req.body {Adminschema}
+ */
 router.post(
   "/login",
   validate([
@@ -41,28 +48,40 @@ router.post(
   ]),
   userLogin
 );
-// 3. Admin can see a list of all admins in own website
-// router.get("/all", loginRequired, adminList);
-// 4. Admin can see other admin with same website's information by id
-router.get(
-  "profile/:id",
 
-  validate([param("id").exists().isString().custom(checkObjectId)]),
-  loginRequired,
-  getSingleUserInfoById
-);
-// 5. Admin can see own user's information
+// 3. Admin can see own user's information
+/**
+ * @method: Get
+ * @access: Login Required
+ * @description: Get User Own information
+ */
 router.get(
   "/profile",
-  // validate([header("Authorization").exists().isString()]),
+  validate([header("Authorization").exists().isString()]),
   loginRequired,
   getUserOwnInfo
 );
-// 6. Owner can update own account profile
+// 4. Owner can update own account profile
+/**
+ * @method: Put
+ * @access: Login Required
+ * @description: Update Avatar, Name and some other information
+ */
 router.put("/profile", loginRequired, updateUserAccount);
-// 7. Owner can deactivate own account
+// 5. Owner can deactivate own account
+/**
+ * @method: Delete
+ * @access: Login Required
+ * @description: Deactive User Account
+ */
 router.delete("/deactivate", loginRequired, deactivateUserAccount);
-// 8. Owner can update password
+// 6. Owner can update password
+
+/**
+ * @method: Put
+ * @access: Login Required
+ * @description: Deactive User Account
+ */
 router.put("/password", loginRequired, updateUserPassword);
 
 module.exports = router;
